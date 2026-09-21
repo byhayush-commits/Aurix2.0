@@ -63,7 +63,11 @@ export const ArtworkBackground: React.FC<{ uri: string }> = ({ uri }) => {
 
 const styles = StyleSheet.create({
   blurArt: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     // Scale past the edges so the blur never shows soft borders.
     transform: [{ scale: 1.25 }],
   },

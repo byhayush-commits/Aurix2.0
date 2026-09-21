@@ -100,7 +100,7 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
   onPress,
   onPlayPause,
   onNext,
-  tabBarHeight = Platform.OS === 'ios' ? 88 : 68,
+  tabBarHeight = Platform.OS === 'ios' ? 80 : 60,
   isLoading = false,
 }) => {
   if (!track) return null;
