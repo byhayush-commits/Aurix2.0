@@ -5,22 +5,15 @@ import { COLORS, FONTS, SIZES } from '../../constants/theme';
 
 interface HeaderProps {
   title: string;
-  /** Optional icon button on the right (edit pencil, bell, etc.) — pass a lucide-react-native icon element. */
   rightIcon?: React.ReactNode;
   onRightPress?: () => void;
 }
 
-/**
- * Large bold title header, per Aurix's Library/Profile/Home screens:
- * big white title top-left, optional single icon action top-right.
- * Sits above scrolling content — screens are responsible for their own
- * ScrollView padding-top to clear this plus the status bar.
- */
 export const Header: React.FC<HeaderProps> = ({ title, rightIcon, onRightPress }) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + SIZES.md }]}>
+    <View style={[styles.container, { paddingTop: insets.top + SIZES.lg }]}>
       <Text style={styles.title}>{title}</Text>
       {rightIcon && (
         <TouchableOpacity
@@ -41,7 +34,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: SIZES.md,
-    paddingBottom: SIZES.lg,
+    paddingBottom: SIZES.xl,
+    marginTop: SIZES.md, // Extra breathing space from top
   },
   title: {
     fontFamily: FONTS.extrabold,
@@ -50,6 +44,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   iconButton: {
-    marginTop: 6,
+    marginTop: 10, // Pushes icon down so it isn't stuck to the top
   },
 });
