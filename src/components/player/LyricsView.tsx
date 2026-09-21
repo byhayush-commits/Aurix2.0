@@ -79,8 +79,8 @@ export const LyricsView: React.FC<LyricsViewProps> = ({ track, duration, onSeek 
   if (!state.synced && !state.plain) {
     return (
       <View style={styles.center}>
-        <Text style={styles.emptyTitle}>No lyrics found</Text>
-        <Text style={styles.emptySubtitle}>lrclib.net doesn't have a match for this track yet.</Text>
+        
+        <Text style={styles.emptyTitle}>Sorry Dear too much traffic!!!</Text>
       </View>
     );
   }
