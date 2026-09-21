@@ -26,7 +26,7 @@ import { MusicService } from '../services/MusicService';
 import { useNavigation } from '@react-navigation/native';
 
 const RECENT_KEY = 'note_recent_searches';
-const MAX_RECENT = 7;
+const MAX_RECENT = 4;
 const TRENDING_QUERY = 'trending songs this week';
 const CHART_QUERY = 'top global hits 2024';
 
