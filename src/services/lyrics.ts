@@ -56,7 +56,10 @@ export async function fetchLyrics({ title, artist, album, duration }: FetchLyric
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(`${BASE}/get?${params.toString()}`, { signal: controller.signal });
+    const res = await fetch(`${BASE}/get?${params.toString()}`, { 
+  signal: controller.signal,
+  headers: { 'User-Agent': 'Aurix 2.0' }
+});
     clearTimeout(timeout);
 
     if (!res.ok) {
