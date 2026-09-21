@@ -24,17 +24,11 @@ type StackParams = {
   NowPlaying: undefined;
 };
 
-/**
- * Library tab, restyled as a menu — matches Aurix's Library screen: a row
- * per section leading to its own list, plus a "Recently Added" preview.
- * History is deliberately not a tab anymore; it's wired in here as a row
- * (Profile also links to it via a stat card) — see TabNavigator.
- */
 export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
   const { playTrack, currentTrack, isPlaying, isLoading, togglePlayPause, next } = usePlayer();
-  const { recentlyPlayed, likedPlaylist } = useLibrary();
+  const { recentlyPlayed } = useLibrary();
 
   return (
     <View style={styles.container}>
@@ -49,42 +43,13 @@ export default function LibraryScreen() {
         />
 
         <View style={styles.menu}>
-          <ListRow
-            icon={<ListMusic color={COLORS.text.primary} size={20} />}
-            label="Playlists"
-            onPress={() => navigation.navigate('PlaylistsList')}
-          />
-          <ListRow
-            icon={<Users color={COLORS.text.primary} size={20} />}
-            label="Artists"
-            onPress={() => navigation.navigate('ArtistsList')}
-          />
-          <ListRow
-            icon={<Disc3 color={COLORS.text.primary} size={20} />}
-            label="Albums"
-            onPress={() => navigation.navigate('AlbumsList')}
-          />
-          <ListRow
-            icon={<Music2 color={COLORS.text.primary} size={20} />}
-            label="Songs"
-            onPress={() => navigation.navigate('SongsList')}
-          />
-          <ListRow
-            icon={<Download color={COLORS.text.primary} size={20} />}
-            label="Downloaded Music"
-            onPress={() => navigation.navigate('DownloadedMusic')}
-          />
-          <ListRow
-            icon={<Clock color={COLORS.text.primary} size={20} />}
-            label="Recently Added"
-            onPress={() => navigation.navigate('History')}
-          />
-          <ListRow
-            icon={<Heart color={COLORS.text.primary} size={20} />}
-            label="Favorites"
-            onPress={() => navigation.navigate('Playlist', { playlistId: 'liked' })}
-            showDivider={false}
-          />
+          <ListRow icon={<ListMusic color={COLORS.text.primary} size={20} />} label="Playlists" onPress={() => navigation.navigate('PlaylistsList')} />
+          <ListRow icon={<Users color={COLORS.text.primary} size={20} />} label="Artists" onPress={() => navigation.navigate('ArtistsList')} />
+          <ListRow icon={<Disc3 color={COLORS.text.primary} size={20} />} label="Albums" onPress={() => navigation.navigate('AlbumsList')} />
+          <ListRow icon={<Music2 color={COLORS.text.primary} size={20} />} label="Songs" onPress={() => navigation.navigate('SongsList')} />
+          <ListRow icon={<Download color={COLORS.text.primary} size={20} />} label="Downloaded Music" onPress={() => navigation.navigate('DownloadedMusic')} />
+          <ListRow icon={<Clock color={COLORS.text.primary} size={20} />} label="Recently Added" onPress={() => navigation.navigate('History')} />
+          <ListRow icon={<Heart color={COLORS.text.primary} size={20} />} label="Favorites" onPress={() => navigation.navigate('Playlist', { playlistId: 'liked' })} showDivider={false} />
         </View>
 
         <View style={styles.section}>
@@ -92,19 +57,10 @@ export default function LibraryScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hscroll}>
             {recentlyPlayed.length ? (
               recentlyPlayed.slice(0, 10).map((track) => (
-                <TouchableOpacity
-                  key={track.id}
-                  style={styles.card}
-                  activeOpacity={0.8}
-                  onPress={() => playTrack(track, { tracks: [track], label: 'Recently Added' })}
-                >
+                <TouchableOpacity key={track.id} style={styles.card} activeOpacity={0.8} onPress={() => playTrack(track, { tracks: [track], label: 'Recently Added' })}>
                   <Image source={{ uri: track.albumImageUrl }} style={styles.cardImage} />
-                  <Text style={styles.cardTitle} numberOfLines={1}>
-                    {track.title}
-                  </Text>
-                  <Text style={styles.cardSubtitle} numberOfLines={1}>
-                    {track.artist.name}
-                  </Text>
+                  <Text style={styles.cardTitle} numberOfLines={1}>{track.title}</Text>
+                  <Text style={styles.cardSubtitle} numberOfLines={1}>{track.artist.name}</Text>
                 </TouchableOpacity>
               ))
             ) : (
@@ -117,14 +73,7 @@ export default function LibraryScreen() {
       <StatusBarScrim />
 
       {currentTrack && (
-        <MiniPlayer
-          track={currentTrack}
-          isPlaying={isPlaying}
-          isLoading={isLoading}
-          onPlayPause={togglePlayPause}
-          onNext={next}
-          onPress={() => navigation.navigate('NowPlaying')}
-        />
+        <MiniPlayer track={currentTrack} isPlaying={isPlaying} isLoading={isLoading} onPlayPause={togglePlayPause} onNext={next} onPress={() => navigation.navigate('NowPlaying')} />
       )}
     </View>
   );
@@ -133,21 +82,13 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   menu: {
-    marginHorizontal: SIZES.md,
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: SIZES.radius.lg,
+    paddingHorizontal: SIZES.md,
     marginBottom: SIZES.xl,
   },
   section: { marginBottom: SIZES.lg },
   hscroll: { paddingHorizontal: SIZES.md, gap: SIZES.smd },
   card: { width: 140 },
-  cardImage: {
-    width: 140,
-    height: 140,
-    borderRadius: SIZES.radius.md,
-    backgroundColor: COLORS.surfaceLight,
-    marginBottom: SIZES.xs,
-  },
+  cardImage: { width: 140, height: 140, borderRadius: SIZES.radius.md, backgroundColor: COLORS.surfaceLight, marginBottom: SIZES.xs },
   cardTitle: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.text.primary },
   cardSubtitle: { fontFamily: FONTS.regular, fontSize: 12, color: COLORS.text.secondary, marginTop: 2 },
   emptyHint: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.text.muted, paddingHorizontal: SIZES.md },
