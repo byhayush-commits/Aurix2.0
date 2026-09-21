@@ -45,7 +45,7 @@ export const SIZES = {
    * Clearance a scrolling screen must leave at the bottom so the last row is
    * never trapped under the tab bar + mini player.
    */
-  bottomInset: 150,
+  bottomInset: 130,
   // Aurix spacing scale (--aurix-space-1..7)
   xs: 4,
   sm: 8,
