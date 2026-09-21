@@ -25,26 +25,22 @@ type PlayerContextType = {
   isPlaying: boolean;
   playTrack: (track: Track, context?: { tracks?: Track[]; label?: string }) => void;
   togglePlayPause: () => void;
-
   // --- everything the real player adds ---
   isLoading: boolean;
   isBuffering: boolean;
   error: string | null;
   clearError: () => void;
   retry: () => void;
-
   duration: number;
   volume: number;
   setVolume: (v: number) => void;
   seekTo: (seconds: number) => void;
   /** Jump relative to the current position. Negative rewinds. */
   seekBy: (deltaSeconds: number) => void;
-
   next: () => void;
   previous: () => void;
   hasNext: boolean;
   hasPrevious: boolean;
-
   queue: Track[];
   upcoming: Track[];
   queueContext: string;
@@ -52,14 +48,14 @@ type PlayerContextType = {
   playNext: (tracks: Track | Track[]) => void;
   removeFromQueue: (trackId: string) => void;
   reorderQueue: (from: number, to: number) => void;
+  /** Commit a new order (by track ids) for the upcoming portion of the queue. */
+  reorderUpcoming: (ids: string[]) => void;
   clearQueue: () => void;
   jumpTo: (trackId: string) => void;
-
   shuffle: boolean;
   toggleShuffle: () => void;
   repeat: RepeatMode;
   cycleRepeat: () => void;
-
   isReady: boolean;
   canPlayCurrent: boolean;
 };
@@ -90,11 +86,11 @@ const ProgressContext = createContext<{ position: number; duration: number }>({
 
 export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const queueRef = useRef(new Queue());
-
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [status, setStatus] = useState<PlaybackStatus>(IDLE_STATUS);
+
   /**
-   * Mirror of  for callbacks that only READ it.
+   * Mirror of `status` for callbacks that only READ it.
    *
    * Position ticks ~4x a second. A callback that lists status.position in its
    * deps is rebuilt just as often, and because these callbacks sit in the
@@ -103,6 +99,7 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
    */
   const statusRef = useRef<PlaybackStatus>(IDLE_STATUS);
   statusRef.current = status;
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -146,14 +143,12 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
 
       const id = ++loadId.current;
-
       // Only abort the previous load if it was for a DIFFERENT track. Aborting
       // a load of this same track would kill the shared in-flight resolve that
       // this load is about to join (double-tap on a row does exactly that).
       if (loadingTrackId.current !== track.id) {
         loadAbort.current?.abort();
       }
-
       const controller = new AbortController();
       loadAbort.current = controller;
       loadingTrackId.current = track.id;
@@ -178,7 +173,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       try {
         const stream = await MusicService.resolveStream(track, controller.signal);
         if (id !== loadId.current) return; // superseded by a newer load
-
         await playbackEngine.load(track, stream, options);
         if (id !== loadId.current) return;
 
@@ -187,15 +181,14 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         loadingTrackId.current = null;
         if (__DEV__) console.log('[playback] started', track.title);
         LibraryService.recordPlay(track);
-
         // Warm exactly one track ahead, so pressing skip is instant.
         preloader.schedule(queueRef.current.peekNext());
       } catch (e) {
         if (id !== loadId.current) return;
-
         // Always leave the loading state, whatever went wrong.
         setIsLoading(false);
         loadingTrackId.current = null;
+
         const err = toAppError(e, 'playback_failed');
         if (__DEV__) console.log('[playback] FAILED', track.title, '|', err.kind, '|', err.detail ?? '');
 
@@ -207,10 +200,10 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         // A track that simply cannot play should not strand the queue: step
         // over it and keep going. Network failures are NOT skipped -- the
         // next track would fail identically, so the error is shown instead.
-        const skippable = err.kind === 'track_unavailable' ||
+        const skippable =
+          err.kind === 'track_unavailable' ||
           err.kind === 'region_restricted' ||
           err.kind === 'source_unavailable';
-
         if (skippable && autoSkips.current < MAX_AUTO_SKIPS && queueRef.current.hasNext) {
           autoSkips.current += 1;
           if (__DEV__) console.log('[playback] auto-skip', autoSkips.current, 'past', track.title);
@@ -232,13 +225,11 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     playbackEngine.on('onStatus', (s) => setStatus(s));
-
     playbackEngine.on('onComplete', () => {
       // `auto` so repeat-one replays rather than advances.
       const nextTrack = queueRef.current.next(true);
       bumpQueue();
       persistQueue();
-
       if (!nextTrack) {
         // End of queue: optionally keep going with related tracks.
         void extendWithRelated();
@@ -246,12 +237,10 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
       void loadCurrent({ autoPlay: true });
     });
-
     playbackEngine.on('onError', (e) => {
       setIsLoading(false);
       setError(messageFor(e instanceof AppError ? e : toAppError(e, 'playback_failed')));
     });
-
     return () => {
       preloader.cancel();
       void playbackEngine.release();
@@ -262,21 +251,17 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const extendWithRelated = useCallback(async () => {
     const settings = LibraryService.getSettings();
     const last = queueRef.current.current;
-
     if (!settings.autoplayRelated || !last) return;
-
     try {
       const related = await MusicService.getRelated(last);
       const fresh = related.filter(
         (t) => !queueRef.current.items.some((q) => q.id === t.id)
       );
       if (!fresh.length) return;
-
       queueRef.current.add(fresh.slice(0, 20));
       const nextTrack = queueRef.current.next(false);
       bumpQueue();
       persistQueue();
-
       if (nextTrack) void loadCurrent({ autoPlay: true });
     } catch {
       // Autoplay is a convenience; silence is the right failure mode.
@@ -288,7 +273,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     let cancelled = false;
-
     (async () => {
       try {
         await Promise.all([MusicService.init(), LibraryService.load()]);
@@ -296,25 +280,21 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
         const settings = LibraryService.getSettings();
         endpointSource.setEndpoints(settings.resolverEndpoints);
-
         playbackEngine.setVolume(settings.volume);
         setVolumeState(settings.volume);
         void playbackEngine.configure();
 
         const snapshot = await readJson<QueueSnapshot>(STORAGE_KEYS.queue, EMPTY_QUEUE);
         if (cancelled) return;
-
         if (snapshot.tracks?.length) {
           queueRef.current.restore(snapshot);
           bumpQueue();
-
           const restored = queueRef.current.current;
           if (restored) {
             // Restore the track and its position, but never auto-play on
             // launch -- starting audio unprompted is hostile.
             const saved = await LibraryService.getSavedPlayback();
             if (cancelled) return;
-
             setCurrentTrack(restored);
             lastAttempt.current = {
               track: restored,
@@ -328,7 +308,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         if (!cancelled) setIsReady(true);
       }
     })();
-
     return () => {
       cancelled = true;
     };
@@ -336,27 +315,21 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, []);
 
   // ---- persist playback position ---------------------------------------
-
   // Position ticks ~4x a second but is persisted in whole seconds, so only
   // react when the second actually changes.
   const positionSecond = Math.floor(status.position);
-
   useEffect(() => {
     if (!currentTrack) return;
     LibraryService.savePlayback(currentTrack.id, positionSecond);
-
     // A listen is logged once, mid-playback, not on tap and not on finish --
     // so skipping away early leaves no trace, and a track abandoned near the
     // end still counts.
     if (historyWrittenFor.current === loadId.current) return;
-
     const trackDuration = status.duration || currentTrack.duration || 0;
-
     const threshold = Math.min(
       HISTORY_MIN_SECONDS,
       trackDuration > 0 ? trackDuration * HISTORY_MIN_RATIO : HISTORY_MIN_SECONDS
     );
-
     if (positionSecond >= threshold && positionSecond > 0) {
       historyWrittenFor.current = loadId.current;
       LibraryService.recordListen(currentTrack);
@@ -367,15 +340,13 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Flush pending writes when the app goes to the background or the tab closes.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'background' || state === 'inactive') void flushWrites();
+      if (state === 'background' || 'inactive' === state) void flushWrites();
     });
-
     let onHide: (() => void) | undefined;
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
       onHide = () => void flushWrites();
       window.addEventListener('pagehide', onHide);
     }
-
     return () => {
       sub.remove();
       if (onHide && typeof window !== 'undefined') {
@@ -393,11 +364,9 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         0,
         list.findIndex((t) => t.id === track.id)
       );
-
       queueRef.current.setTracks(list, startIndex, context?.label ?? '');
       bumpQueue();
       persistQueue();
-
       void loadCurrent({ autoPlay: true });
     },
     [bumpQueue, loadCurrent, persistQueue]
@@ -406,7 +375,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const togglePlayPause = useCallback(() => {
     const track = queueRef.current.current ?? currentTrack;
     if (!track) return;
-
     // Restored-but-never-loaded track: the first press starts it.
     if (playbackEngine.trackId !== track.id) {
       if (!queueRef.current.current) {
@@ -419,7 +387,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       });
       return;
     }
-
     if (status.isPlaying) playbackEngine.pause();
     else playbackEngine.play();
   }, [bumpQueue, currentTrack, loadCurrent, status.isPlaying]);
@@ -428,7 +395,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const nextTrack = queueRef.current.next(false);
     bumpQueue();
     persistQueue();
-
     if (!nextTrack) {
       void extendWithRelated();
       return;
@@ -442,7 +408,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       void playbackEngine.seekTo(0);
       return;
     }
-
     queueRef.current.previous();
     bumpQueue();
     persistQueue();
@@ -478,7 +443,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const retry = useCallback(() => {
     const attempt = lastAttempt.current;
     if (!attempt) return;
-
     setError(null);
     MusicService.invalidateStream(attempt.track);
     void loadCurrent({ autoPlay: true, startPosition: attempt.position });
@@ -494,7 +458,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       queueRef.current.add(tracks);
       bumpQueue();
       persistQueue();
-
       if (wasEmpty) void loadCurrent({ autoPlay: true });
     },
     [bumpQueue, loadCurrent, persistQueue]
@@ -506,7 +469,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       queueRef.current.playNext(tracks);
       bumpQueue();
       persistQueue();
-
       if (wasEmpty) void loadCurrent({ autoPlay: true });
       else preloader.schedule(queueRef.current.peekNext());
     },
@@ -518,7 +480,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       const removedCurrent = queueRef.current.remove(trackId);
       bumpQueue();
       persistQueue();
-
       // Removing the playing track slides the next one into its place.
       if (removedCurrent) {
         if (queueRef.current.current) void loadCurrent({ autoPlay: true });
@@ -540,6 +501,16 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     [bumpQueue, persistQueue]
   );
 
+  /** Commit the drag-to-reorder sheet's new upcoming order (by track ids). */
+  const reorderUpcoming = useCallback(
+    (ids: string[]) => {
+      queueRef.current.reorderUpcoming(ids);
+      bumpQueue();
+      persistQueue();
+    },
+    [bumpQueue, persistQueue]
+  );
+
   const clearQueue = useCallback(() => {
     queueRef.current.clearUpcoming();
     bumpQueue();
@@ -550,7 +521,6 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     (trackId: string) => {
       const track = queueRef.current.jumpTo(trackId);
       if (!track) return;
-
       bumpQueue();
       persistQueue();
       void loadCurrent({ autoPlay: true });
@@ -598,24 +568,20 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       isPlaying: status.isPlaying,
       playTrack,
       togglePlayPause,
-
       isLoading,
       isBuffering: status.isBuffering,
       error,
       clearError,
       retry,
-
       duration,
       volume,
       setVolume,
       seekTo,
       seekBy,
-
       next,
       previous,
       hasNext: queueSnapshot.hasNext,
       hasPrevious: queueSnapshot.hasPrevious,
-
       queue: queueSnapshot.items,
       upcoming: queueSnapshot.upcoming,
       queueContext: queueSnapshot.context,
@@ -623,14 +589,13 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       playNext: playNextInQueue,
       removeFromQueue,
       reorderQueue,
+      reorderUpcoming,
       clearQueue,
       jumpTo,
-
       shuffle: queueSnapshot.shuffle,
       toggleShuffle,
       repeat: queueSnapshot.repeat,
       cycleRepeat,
-
       isReady,
       canPlayCurrent: currentTrack ? MusicService.canPlay(currentTrack) : false,
     }),
@@ -656,6 +621,7 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       playNextInQueue,
       removeFromQueue,
       reorderQueue,
+      reorderUpcoming,
       clearQueue,
       jumpTo,
       toggleShuffle,
