@@ -22,9 +22,9 @@ export const EMPTY_QUEUE: QueueSnapshot = {
 /**
  * The real queue behind the UI.
  *
- * Shuffle is modelled as a separate play order over the same array rather than
- * by mutating it, so toggling shuffle off restores the true order and never
- * loses or duplicates a track.
+ * Shuffle is modelled as a separate play order over the same array rather
+ * than by mutating it, so toggling shuffle off restores the true order and
+ * never loses or duplicates a track.
  */
 export class Queue {
   private tracks: Track[] = [];
@@ -96,9 +96,7 @@ export class Queue {
     this.shuffleOn = snapshot.shuffle ?? false;
     this.repeatMode = snapshot.repeat ?? 'off';
     this.contextLabel = snapshot.context ?? '';
-
     this.rebuildOrder();
-
     const startAt = snapshot.index ?? -1;
     this.position = startAt >= 0 ? this.order.indexOf(startAt) : -1;
   }
@@ -109,13 +107,11 @@ export class Queue {
   setTracks(tracks: Track[], startIndex = 0, context = ''): void {
     this.tracks = dedupe(tracks);
     this.contextLabel = context;
-
     // A de-dupe may have shifted the intended start.
     const target = tracks[startIndex];
     const resolvedStart = target
       ? Math.max(0, this.tracks.findIndex((t) => t.id === target.id))
       : 0;
-
     this.rebuildOrder(resolvedStart);
     this.position = this.order.indexOf(resolvedStart);
     if (this.position < 0) this.position = this.tracks.length ? 0 : -1;
@@ -127,12 +123,10 @@ export class Queue {
     const existing = new Set(this.tracks.map((t) => t.id));
     const fresh = incoming.filter((t) => !existing.has(t.id));
     if (!fresh.length) return;
-
     const firstNew = this.tracks.length;
     this.tracks.push(...fresh);
     // Appended tracks go at the end of the play order, shuffled or not.
     for (let i = 0; i < fresh.length; i++) this.order.push(firstNew + i);
-
     if (this.position < 0 && this.order.length) this.position = 0;
   }
 
@@ -140,17 +134,13 @@ export class Queue {
   playNext(tracks: Track | Track[]): void {
     const incoming = Array.isArray(tracks) ? tracks : [tracks];
     if (!incoming.length) return;
-
     // Remove any existing copies so "play next" actually moves them.
     for (const t of incoming) this.remove(t.id, { keepCurrent: true });
-
     const firstNew = this.tracks.length;
     this.tracks.push(...incoming);
-
     const insertAt = this.position + 1;
     const newOrder = incoming.map((_, i) => firstNew + i);
     this.order.splice(insertAt, 0, ...newOrder);
-
     if (this.position < 0 && this.order.length) this.position = 0;
   }
 
@@ -158,17 +148,13 @@ export class Queue {
   remove(trackId: string, opts: { keepCurrent?: boolean } = {}): boolean {
     const trackIndex = this.tracks.findIndex((t) => t.id === trackId);
     if (trackIndex < 0) return false;
-
     const wasCurrent = this.currentIndex === trackIndex;
     if (wasCurrent && opts.keepCurrent) return false;
-
     const orderPos = this.order.indexOf(trackIndex);
-
     this.tracks.splice(trackIndex, 1);
     this.order.splice(orderPos, 1);
     // Every index after the removed one shifts down by one.
     this.order = this.order.map((i) => (i > trackIndex ? i - 1 : i));
-
     if (orderPos < this.position) {
       this.position -= 1;
     } else if (orderPos === this.position) {
@@ -176,7 +162,6 @@ export class Queue {
       this.position = Math.min(this.position, this.order.length - 1);
     }
     if (!this.order.length) this.position = -1;
-
     return wasCurrent;
   }
 
@@ -184,15 +169,38 @@ export class Queue {
   reorder(from: number, to: number): void {
     if (from === to) return;
     if (from < 0 || from >= this.order.length) return;
-
     const clampedTo = Math.max(0, Math.min(to, this.order.length - 1));
     const currentOrderValue = this.order[this.position];
-
     const [moved] = this.order.splice(from, 1);
     this.order.splice(clampedTo, 0, moved);
-
     // Keep pointing at the same track after the move.
     this.position = this.order.indexOf(currentOrderValue);
+  }
+
+  /**
+   * Replace the upcoming portion of the play order with the exact id order
+   * given (used by the drag-to-reorder queue sheet). History and the
+   * currently playing track are left completely untouched.
+   */
+  reorderUpcoming(ids: string[]): void {
+    const provided = ids
+      .map((id) => this.tracks.findIndex((t) => t.id === id))
+      .filter((i) => i >= 0);
+    const providedSet = new Set(provided);
+
+    // Safety: never silently drop an upcoming track the caller forgot.
+    const previousUpcoming = this.order.slice(Math.max(0, this.position + 1));
+    const missing = previousUpcoming.filter((i) => !providedSet.has(i));
+
+    if (this.position < 0) {
+      // Nothing playing: the given order simply becomes the play order.
+      this.order = [...provided, ...missing];
+      return;
+    }
+
+    // Keep history + current exactly where they are, then the new order.
+    const historyAndCurrent = this.order.slice(0, this.position + 1);
+    this.order = [...historyAndCurrent, ...provided, ...missing];
   }
 
   clear(): void {
@@ -217,7 +225,6 @@ export class Queue {
   setShuffle(on: boolean): void {
     if (this.shuffleOn === on) return;
     this.shuffleOn = on;
-
     const currentTrackIndex = this.currentIndex;
     this.rebuildOrder(currentTrackIndex >= 0 ? currentTrackIndex : undefined);
     this.position = currentTrackIndex >= 0 ? this.order.indexOf(currentTrackIndex) : -1;
@@ -242,43 +249,35 @@ export class Queue {
 
   /**
    * Advance to the next track.
-   *
    * `auto` distinguishes a track finishing on its own (where repeat-one
    * replays the same track) from the user pressing next (where it does not).
    */
   next(auto = false): Track | null {
     if (!this.tracks.length) return null;
-
     if (auto && this.repeatMode === 'one') return this.current;
-
     if (this.position < this.order.length - 1) {
       this.position += 1;
       return this.current;
     }
-
     if (this.repeatMode === 'all' || (this.repeatMode === 'one' && !auto)) {
       // Reshuffle on wrap so a repeated shuffled queue is not identical.
       if (this.shuffleOn) this.rebuildOrder();
       this.position = 0;
       return this.current;
     }
-
     return null; // end of queue
   }
 
   previous(): Track | null {
     if (!this.tracks.length) return null;
-
     if (this.position > 0) {
       this.position -= 1;
       return this.current;
     }
-
     if (this.repeatMode === 'all') {
       this.position = this.order.length - 1;
       return this.current;
     }
-
     return this.current; // already first: restart it
   }
 
@@ -286,10 +285,8 @@ export class Queue {
   jumpTo(trackId: string): Track | null {
     const trackIndex = this.tracks.findIndex((t) => t.id === trackId);
     if (trackIndex < 0) return null;
-
     const orderPos = this.order.indexOf(trackIndex);
     if (orderPos < 0) return null;
-
     this.position = orderPos;
     return this.current;
   }
@@ -312,20 +309,16 @@ export class Queue {
    */
   private rebuildOrder(pinFirst?: number): void {
     const indices = this.tracks.map((_, i) => i);
-
     if (!this.shuffleOn) {
       this.order = indices;
       return;
     }
-
     const rest = pinFirst === undefined ? indices : indices.filter((i) => i !== pinFirst);
-
     // Fisher-Yates.
     for (let i = rest.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [rest[i], rest[j]] = [rest[j], rest[i]];
     }
-
     this.order = pinFirst === undefined ? rest : [pinFirst, ...rest];
   }
 }
