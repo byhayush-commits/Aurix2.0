@@ -24,8 +24,8 @@ import {
   ListPlus,
   Mic2,
 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { ArtworkBackground } from '../components/player/ArtworkBackground';
 import { PlaybackSourceSheet } from '../components/player/PlaybackSourceSheet';
 import { QueueSheet } from '../components/player/QueueSheet';
 import { SeekBar } from '../components/player/SeekBar';
@@ -86,18 +86,8 @@ export default function NowPlayingScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Dynamic blurred artwork background (Apple-style depth) */}
-      <Image
-        source={{ uri: currentTrack.albumImageUrl }}
-        style={StyleSheet.absoluteFill}
-        blurRadius={150}
-        resizeMode="cover"
-      />
-      <LinearGradient
-        colors={['rgba(0, 0, 0, 0.3)', 'rgba(10, 10, 10, 0.85)', COLORS.background]}
-        locations={[0, 0.5, 0.9]}
-        style={StyleSheet.absoluteFill}
-      />
+      {/* Dynamic per-album colour background (Apple-style) */}
+      <ArtworkBackground uri={currentTrack.albumImageUrl} />
 
       <View style={[styles.content, { paddingTop: insets.top + SIZES.xl, paddingBottom: insets.bottom + SIZES.md }]}>
 
