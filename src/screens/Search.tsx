@@ -91,12 +91,12 @@ export default function SearchScreen() {
       const trimmed = term.trim();
       if (!trimmed) return;
       setRecentSearches((prev) => {
-        const next = [trimmed, ...prev.filter((s) => s.toLowerCase() !== trimmed.toLowerCase())].slice(
+        const nextList = [trimmed, ...prev.filter((s) => s.toLowerCase() !== trimmed.toLowerCase())].slice(
           0,
           MAX_RECENT
         );
-        saveRecent(next);
-        return next;
+        saveRecent(nextList);
+        return nextList;
       });
     },
     [setQuery, searchNow]
@@ -109,9 +109,9 @@ export default function SearchScreen() {
 
   const removeOneRecent = useCallback((term: string) => {
     setRecentSearches((prev) => {
-      const next = prev.filter((s) => s !== term);
-      saveRecent(next);
-      return next;
+      const nextList = prev.filter((s) => s !== term);
+      saveRecent(nextList);
+      return nextList;
     });
   }, []);
 
@@ -223,7 +223,7 @@ export default function SearchScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: SIZES.bottomInset }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingTop: insets.top + SIZES.lg }}>
+        <View style={{ paddingTop: insets.top + SIZES.xl }}>
           <Text style={styles.headerTitle}>Explore</Text>
 
           <View style={[styles.searchContainer, focused && styles.searchContainerFocused]}>
@@ -354,15 +354,23 @@ export default function SearchScreen() {
                     <Text style={styles.clearAll}>Clear all</Text>
                   </TouchableOpacity>
                 </View>
-                {recentSearches.map((term) => (
-                  <TouchableOpacity key={term} style={styles.recentRow} onPress={() => commitSearch(term)}>
-                    <Clock color={COLORS.iconInactive} size={17} />
-                    <Text style={styles.recentText} numberOfLines={1}>{term}</Text>
-                    <TouchableOpacity onPress={() => removeOneRecent(term)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                      <X color={COLORS.iconInactive} size={15} />
-                    </TouchableOpacity>
-                  </TouchableOpacity>
-                ))}
+                <View style={styles.recentCard}>
+                  {recentSearches.map((term, i) => (
+                    <View key={term} style={[styles.recentRowWrap, i < recentSearches.length - 1 && styles.recentDivider]}>
+                      <TouchableOpacity style={styles.recentRow} onPress={() => commitSearch(term)}>
+                        <Clock color={COLORS.iconInactive} size={17} />
+                        <Text style={styles.recentText} numberOfLines={1}>{term}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.recentRemove}
+                        onPress={() => removeOneRecent(term)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      >
+                        <X color={COLORS.iconInactive} size={15} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
               </View>
             )}
 
@@ -441,10 +449,10 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: SIZES.md },
   headerTitle: {
     fontFamily: FONTS.extrabold,
-    fontSize: 30,
+    fontSize: 34,
     color: COLORS.text.primary,
     letterSpacing: -0.5,
-    marginBottom: SIZES.smd,
+    marginBottom: SIZES.md,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -453,7 +461,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceLight,
     borderRadius: SIZES.radius.search,
     paddingHorizontal: SIZES.md,
-    height: 48,
+    height: 50,
     marginBottom: SIZES.lg,
   },
   searchContainerFocused: {
@@ -486,17 +494,36 @@ const styles = StyleSheet.create({
     color: COLORS.accent.green,
   },
   recentSection: { marginBottom: SIZES.md },
+  recentCard: {
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: SIZES.radius.lg,
+    overflow: 'hidden',
+  },
+  recentRowWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingRight: SIZES.md,
+  },
+  recentDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: COLORS.hairline,
+  },
   recentRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: SIZES.md,
-    paddingVertical: SIZES.sm,
+    paddingVertical: SIZES.smd,
+    paddingLeft: SIZES.md,
   },
   recentText: {
     flex: 1,
     fontFamily: FONTS.medium,
     fontSize: 14,
     color: COLORS.text.primary,
+  },
+  recentRemove: {
+    padding: SIZES.xs,
   },
   categoriesGrid: {
     flexDirection: 'row',
