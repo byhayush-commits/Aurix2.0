@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Heart, Clock, Pencil, ExternalLink, Hammer, Instagram } from 'lucide-react-native';
+import { Heart, Clock, Pencil, ExternalLink, Hammer, AtSign } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -177,7 +177,7 @@ export default function ProfileScreen() {
                 activeOpacity={0.7}
                 onPress={() => open(IG_URL)}
               >
-                <Instagram color={COLORS.text.primary} size={18} />
+                <AtSign color={COLORS.text.primary} size={18} />
                 <Text style={styles.builderIgHandle}>vivac_ayu</Text>
               </TouchableOpacity>
             </View>
