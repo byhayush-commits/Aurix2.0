@@ -20,17 +20,15 @@ export const TabNavigator = () => {
         tabBarBackground: () => <View style={styles.tabBarBackground} />,
         tabBarActiveTintColor: COLORS.accent.green,
         tabBarInactiveTintColor: COLORS.iconInactive,
-        tabBarShowLabel: true,
-        tabBarLabelStyle: styles.tabBarLabel,
+        tabBarShowLabel: false, // Removed text labels
       }}
     >
       <Tab.Screen 
         name="HomeTab" 
         component={HomeScreen} 
         options={{
-          tabBarLabel: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <Home color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+            <Home color={color} size={24} strokeWidth={focused ? 2 : 1.5} />
           ),
         }}
       />
@@ -38,11 +36,8 @@ export const TabNavigator = () => {
         name="SearchTab" 
         component={SearchScreen} 
         options={{
-          // Screen and its data/logic are unchanged — only the tab-bar label
-          // and icon are renamed to match Aurix's "Explore" tab.
-          tabBarLabel: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <Search color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+            <Search color={color} size={24} strokeWidth={focused ? 2 : 1.5} />
           ),
         }}
       />
@@ -50,9 +45,8 @@ export const TabNavigator = () => {
         name="LibraryTab" 
         component={LibraryScreen} 
         options={{
-          tabBarLabel: 'Library',
           tabBarIcon: ({ color, focused }) => (
-            <Library color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+            <Library color={color} size={24} strokeWidth={focused ? 2 : 1.5} />
           ),
         }}
       />
@@ -60,11 +54,8 @@ export const TabNavigator = () => {
         name="ProfileTab"
         component={ProfileScreen}
         options={{
-          // Replaces the old HistoryTab — History moved to a row inside
-          // Library plus a stat card here (both push the same History screen).
-          tabBarLabel: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <CircleUserRound color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+            <CircleUserRound color={color} size={24} strokeWidth={focused ? 2 : 1.5} />
           ),
         }}
       />
@@ -79,7 +70,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    // Opaque: blur does not reliably hide content behind it on Android.
     backgroundColor: COLORS.surfaceRaised,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: COLORS.hairline,
@@ -89,12 +79,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     elevation: 0,
     backgroundColor: 'transparent',
-    height: Platform.OS === 'ios' ? 88 : 68,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+    // Sleek, thinner height
+    height: Platform.OS === 'ios' ? 80 : 60, 
+    paddingBottom: Platform.OS === 'ios' ? 20 : 8,
     paddingTop: 8,
   },
-  tabBarLabel: {
-    fontSize: 10,
-    marginTop: 4,
-  }
 });
