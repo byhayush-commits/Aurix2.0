@@ -120,7 +120,12 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
    */
   const autoSkips = useRef(0);
   /** Load id whose listen has already been written to history. */
-  const historyWrittenFor = useRef<number | null>(null);
+  /** Track id a listen has already been logged for — NOT the load id: a
+   * same-track reload (double-tap on the currently playing row, re-selecting
+   * it from the queue) must not reopen the history-logging window, or the
+   * position-threshold effect below fires again and writes a duplicate entry
+   * for a listen that never actually restarted. */
+  const historyWrittenFor = useRef<string | null>(null);
 
   const bumpQueue = useCallback(() => setQueueVersion((v) => v + 1), []);
 
@@ -143,18 +148,19 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
 
       const id = ++loadId.current;
-      // Only abort the previous load if it was for a DIFFERENT track. Aborting
-      // a load of this same track would kill the shared in-flight resolve that
-      // this load is about to join (double-tap on a row does exactly that).
+      // Only abort the previous load -- and only reopen the history-logging
+      // window -- if this is genuinely a DIFFERENT track. A same-track reload
+      // (double-tap on the playing row, re-picking it from the queue) joins
+      // the existing in-flight resolve and must not look like a fresh listen.
       if (loadingTrackId.current !== track.id) {
         loadAbort.current?.abort();
+        historyWrittenFor.current = null;
       }
       const controller = new AbortController();
       loadAbort.current = controller;
       loadingTrackId.current = track.id;
 
       const preloadedThis = preloader.pending === track.id;
-      historyWrittenFor.current = null;
 
       // Stop warming anything that is no longer next -- but if we were warming
       // THIS track, adopt that request instead of aborting it: resolveStream
@@ -324,14 +330,14 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     // A listen is logged once, mid-playback, not on tap and not on finish --
     // so skipping away early leaves no trace, and a track abandoned near the
     // end still counts.
-    if (historyWrittenFor.current === loadId.current) return;
+    if (historyWrittenFor.current === currentTrack.id) return;
     const trackDuration = status.duration || currentTrack.duration || 0;
     const threshold = Math.min(
       HISTORY_MIN_SECONDS,
       trackDuration > 0 ? trackDuration * HISTORY_MIN_RATIO : HISTORY_MIN_SECONDS
     );
     if (positionSecond >= threshold && positionSecond > 0) {
-      historyWrittenFor.current = loadId.current;
+      historyWrittenFor.current = currentTrack.id;
       LibraryService.recordListen(currentTrack);
       if (__DEV__) console.log('[history] logged', currentTrack.title);
     }
