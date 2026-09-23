@@ -11,7 +11,7 @@ export default function DownloadedMusicScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + SIZES.sm }]}>
+      <View style={[styles.header, { paddingTop: insets.top + SIZES.xl }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}

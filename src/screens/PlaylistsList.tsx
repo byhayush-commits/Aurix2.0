@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChevronLeft, Plus, Trash2, X } from 'lucide-react-native';
+import { ChevronLeft, Plus, Trash2, X, Heart } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
@@ -92,7 +92,7 @@ export default function PlaylistsListScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + SIZES.sm }]}>
+      <View style={[styles.header, { paddingTop: insets.top + SIZES.xl }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
@@ -178,10 +178,17 @@ export default function PlaylistsListScreen() {
             onPress={() => openPlaylist(playlist)}
             onLongPress={() => onPlayPlaylist(playlist)}
           >
-            {playlist.coverImageUrl && playlist.coverImageUrl !== 'liked_songs_gradient' ? (
-              <Image source={{ uri: playlist.coverImageUrl }} style={styles.image} />
+            {playlist.id === 'liked' ? (
+              <View style={[styles.image, styles.likedGradient]}>
+                <Heart color={COLORS.text.primary} size={22} fill={COLORS.text.primary} />
+              </View>
+            ) : playlist.coverImageUrl || playlist.tracks[0]?.albumImageUrl ? (
+              <Image
+                source={{ uri: playlist.coverImageUrl || playlist.tracks[0]?.albumImageUrl }}
+                style={styles.image}
+              />
             ) : (
-              <View style={[styles.image, styles.likedGradient]} />
+              <View style={[styles.image, styles.emptyCover]} />
             )}
             <View style={styles.info}>
               <Text style={styles.title}>{playlist.name}</Text>
@@ -246,7 +253,8 @@ const styles = StyleSheet.create({
   importError: { fontFamily: FONTS.regular, fontSize: 12, color: COLORS.accent.red, marginTop: SIZES.sm },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: SIZES.md, paddingVertical: SIZES.xs },
   image: { width: 64, height: 64, borderRadius: SIZES.radius.sm, backgroundColor: COLORS.surfaceLight },
-  likedGradient: { backgroundColor: COLORS.accent.green },
+  likedGradient: { backgroundColor: COLORS.accent.green, alignItems: 'center', justifyContent: 'center' },
+  emptyCover: { backgroundColor: COLORS.surfaceLight },
   info: { flex: 1, marginLeft: SIZES.md, justifyContent: 'center' },
   title: { fontFamily: FONTS.medium, fontSize: 16, color: COLORS.text.primary, marginBottom: 4 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.text.secondary },

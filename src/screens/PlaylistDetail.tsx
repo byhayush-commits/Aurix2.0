@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChevronLeft, Play, Shuffle, ListPlus } from 'lucide-react-native';
+import { Play, Shuffle, ListPlus, Heart } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { TrackRow } from '../components/lists/TrackRow';
@@ -99,10 +99,7 @@ export default function PlaylistDetailScreen() {
 
   if (!playlist) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top + SIZES.lg }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <ChevronLeft color={COLORS.text.primary} size={28} />
-        </TouchableOpacity>
+      <View style={[styles.container, { paddingTop: insets.top + SIZES.xxl }]}>
         <GlassCard intensity={20} style={styles.emptyCard}>
           <Text style={styles.emptyText}>This playlist is no longer available.</Text>
         </GlassCard>
@@ -110,11 +107,24 @@ export default function PlaylistDetailScreen() {
     );
   }
 
+  const isLikedPlaylist = playlist.id === 'liked';
+  // Real cover art beats the flat placeholder: a normal playlist with no
+  // explicit cover shows its first track's own artwork instead of a solid
+  // block. Liked Songs never had a real cover to begin with (its
+  // coverImageUrl is a sentinel, not a URL) -- it gets a heart instead.
+  const coverImageUrl = isLikedPlaylist
+    ? null
+    : playlist.coverImageUrl || tracks[0]?.albumImageUrl || null;
+
   const header = (
     <View style={styles.headerBlock}>
       <View style={styles.artworkWrap}>
-        {playlist.coverImageUrl ? (
-          <Image source={{ uri: playlist.coverImageUrl }} style={styles.artwork} />
+        {isLikedPlaylist ? (
+          <View style={[styles.artwork, styles.likedArtwork]}>
+            <Heart color={COLORS.text.primary} size={64} fill={COLORS.text.primary} />
+          </View>
+        ) : coverImageUrl ? (
+          <Image source={{ uri: coverImageUrl }} style={styles.artwork} />
         ) : (
           <View style={[styles.artwork, styles.artworkFallback]} />
         )}
@@ -176,7 +186,7 @@ export default function PlaylistDetailScreen() {
           </GlassCard>
         }
         contentContainerStyle={{
-          paddingTop: insets.top + SIZES.xxl,
+          paddingTop: insets.top + SIZES.xxxl,
           paddingBottom: SIZES.bottomInset,
         }}
         showsVerticalScrollIndicator={false}
@@ -185,14 +195,9 @@ export default function PlaylistDetailScreen() {
         removeClippedSubviews
       />
 
-      {/* Floating back control, above the list. */}
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={[styles.backButton, { top: insets.top + SIZES.sm }]}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-      >
-        <ChevronLeft color={COLORS.text.primary} size={28} />
-      </TouchableOpacity>
+      {/* Explicit back control removed -- the stack's swipe-back gesture and
+          hardware back already handle this; app.json / your reference ask
+          for navigation-chrome-free screens where the OS already helps. */}
 
       <AddToPlaylistSheet track={addingTrack} onClose={() => setAddingTrack(null)} />
 
@@ -244,6 +249,11 @@ const styles = StyleSheet.create({
   },
   artworkFallback: {
     backgroundColor: COLORS.surfaceRaised,
+  },
+  likedArtwork: {
+    backgroundColor: COLORS.accent.green,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontFamily: FONTS.bold,

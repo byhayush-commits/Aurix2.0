@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
+  Animated,
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
@@ -37,6 +38,43 @@ import { useLibrary } from '../hooks/useLibrary';
 import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
+
+/**
+ * "Aurix" wordmark with a slow pulsing glow -- used ONLY as the Lyrics-view
+ * header centerpiece (per request: no plain/normal "Aurix" text anywhere
+ * else in the app, just this one shining treatment, here alone).
+ */
+const GlowingWordmark: React.FC = () => {
+  const pulse = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 0, duration: 1400, useNativeDriver: false }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+
+  const textShadowRadius = pulse.interpolate({ inputRange: [0, 1], outputRange: [4, 16] });
+  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
+
+  return (
+    <Animated.Text
+      style={[
+        styles.glowWordmark,
+        {
+          opacity,
+          textShadowRadius,
+        },
+      ]}
+    >
+      Aurix
+    </Animated.Text>
+  );
+};
 
 export default function NowPlayingScreen() {
   const insets = useSafeAreaInsets();
@@ -96,7 +134,9 @@ export default function NowPlayingScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerIcon}>
             <ChevronDown color={COLORS.text.primary} size={28} />
           </TouchableOpacity>
-          <View style={{ flex: 1 }} />
+          <View style={styles.headerCenter}>
+            {view === 'lyrics' && <GlowingWordmark />}
+          </View>
           <TouchableOpacity style={styles.headerIcon} onPress={() => setAddingTrack(currentTrack)}>
             <ListPlus color={COLORS.text.primary} size={24} />
           </TouchableOpacity>
@@ -124,13 +164,6 @@ export default function NowPlayingScreen() {
           </>
         ) : (
           <View style={styles.lyricsWrap}>
-            <View style={styles.lyricsHeaderRow}>
-              <Image source={{ uri: currentTrack.albumImageUrl }} style={styles.lyricsThumb} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.lyricsHeaderTitle} numberOfLines={1}>{currentTrack.title}</Text>
-                <Text style={styles.lyricsHeaderArtist} numberOfLines={1}>{currentTrack.artist.name}</Text>
-              </View>
-            </View>
             <LyricsView track={currentTrack} duration={duration} onSeek={seekTo} />
           </View>
         )}
@@ -222,6 +255,15 @@ const styles = StyleSheet.create({
   content: { flex: 1, paddingHorizontal: SIZES.lg, justifyContent: 'space-between' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SIZES.lg },
   headerIcon: { padding: SIZES.xs },
+  headerCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  glowWordmark: {
+    fontFamily: FONTS.extrabold,
+    fontSize: 20,
+    color: COLORS.text.primary,
+    letterSpacing: 0.5,
+    textShadowColor: COLORS.accent.green,
+    textShadowOffset: { width: 0, height: 0 },
+  },
   artworkContainer: {
     width: width - SIZES.lg * 2,
     height: width - SIZES.lg * 2,
@@ -241,10 +283,6 @@ const styles = StyleSheet.create({
   trackTitle: { fontFamily: FONTS.medium, fontSize: 24, color: COLORS.text.primary, marginBottom: 4 },
   trackArtist: { fontFamily: FONTS.regular, fontSize: 16, color: COLORS.text.secondary },
   lyricsWrap: { flex: 1, marginBottom: SIZES.md },
-  lyricsHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: SIZES.sm, paddingBottom: SIZES.sm },
-  lyricsThumb: { width: 40, height: 40, borderRadius: 10, opacity: 0.7 },
-  lyricsHeaderTitle: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.text.primary },
-  lyricsHeaderArtist: { fontFamily: FONTS.regular, fontSize: 11.5, color: 'rgba(255,255,255,0.5)', marginTop: 1 },
   controlsContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SIZES.xl, paddingHorizontal: SIZES.sm },
   playButton: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.text.primary, justifyContent: 'center', alignItems: 'center' },
   bottomActions: { flexDirection: 'row', alignItems: 'center' },
