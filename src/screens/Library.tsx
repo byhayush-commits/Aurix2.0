@@ -81,8 +81,9 @@ export default function LibraryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  // No horizontal padding here — ListRow already carries SIZES.md padding.
+  // Double padding was pushing icons/labels right of the title's left edge.
   menu: {
-    paddingHorizontal: SIZES.md,
     marginBottom: SIZES.xl,
   },
   section: { marginBottom: SIZES.lg },
