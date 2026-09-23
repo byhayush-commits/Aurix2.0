@@ -80,7 +80,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({ track, duration, onSeek 
     return (
       <View style={styles.center}>
         
-        <Text style={styles.emptyTitle}>Sorry Dear too much traffic!!!</Text>
+        <Text style={styles.emptyTitle}>Oops,you made my lyrics blush!</Text>
       </View>
     );
   }
