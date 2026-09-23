@@ -169,7 +169,11 @@ export const QueueSheet: React.FC<QueueSheetProps> = ({
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={{ paddingBottom: SIZES.lg }} scrollEnabled={dragId === null}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: SIZES.lg }}
+          scrollEnabled={dragId === null}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Now playing row — pink + animated EQ, per Image 4 */}
           {currentTrack && (
             <View style={styles.currentRow}>
@@ -213,14 +217,10 @@ export const QueueSheet: React.FC<QueueSheetProps> = ({
                     <X color={COLORS.text.disabled} size={15} />
                   </TouchableOpacity>
 
-                  {/* Drag grip — 6 dots like Image 4 */}
-                  <View style={styles.gripTouch} {...getPan(track.id).panHandlers}>
-                    <View style={styles.gripDots}>
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <View key={i} style={styles.gripDot} />
-                      ))}
-                    </View>
-                  </View>
+                  {/* Invisible drag handle in the same spot the dots used to
+                      occupy -- reordering still works via long-press+drag
+                      here, just without the visible 6-dot graphic. */}
+                  <View style={styles.gripTouch} {...getPan(track.id).panHandlers} />
                 </View>
               );
             })
