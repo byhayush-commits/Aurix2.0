@@ -4,16 +4,8 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { TabNavigator } from './TabNavigator';
 import { COLORS } from '../constants/theme';
 import { useLibrary } from '../hooks/useLibrary';
-import OnboardingScreen from '../screens/Onboarding';
 import ProfileSetupScreen from '../screens/ProfileSetup';
-import PlaylistDetailScreen from '../screens/PlaylistDetail';
 import NowPlayingScreen from '../screens/NowPlaying';
-import HistoryScreen from '../screens/History';
-import PlaylistsListScreen from '../screens/PlaylistsList';
-import ArtistsListScreen from '../screens/ArtistsList';
-import AlbumsListScreen from '../screens/AlbumsList';
-import SongsListScreen from '../screens/SongsList';
-import DownloadedMusicScreen from '../screens/DownloadedMusic';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,24 +25,18 @@ export const RootNavigator = () => {
   // user is flashed the onboarding screen for a frame.
   if (!isLoaded) return null;
 
-  const initialRoute = profile.completed ? 'Main' : 'Onboarding';
+  const initialRoute = profile.completed ? 'Main' : 'ProfileSetup';
 
   return (
     <NavigationContainer theme={NoteTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        {/* Onboarding (the old "N Ø T E" branded splash) removed from the
+            first-launch flow — new users land straight on ProfileSetup. */}
         <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
-        <Stack.Screen name="Playlist" component={PlaylistDetailScreen} />
-        {/* Library menu destinations — pushed from the Library tab, not tabs themselves. */}
-        <Stack.Screen name="PlaylistsList" component={PlaylistsListScreen} />
-        <Stack.Screen name="ArtistsList" component={ArtistsListScreen} />
-        <Stack.Screen name="AlbumsList" component={AlbumsListScreen} />
-        <Stack.Screen name="SongsList" component={SongsListScreen} />
-        <Stack.Screen name="DownloadedMusic" component={DownloadedMusicScreen} />
-        {/* History left the tab bar (Profile replaced it) — still reachable
-            from Library's "Recently Added" row and Profile's stat card. */}
-        <Stack.Screen name="History" component={HistoryScreen} />
+        {/* Playlists, Artists, Albums, Songs, Downloaded Music and History
+            all moved into LibraryStack (nested inside the Library tab) so
+            the bottom tab bar stays visible on them -- see LibraryStack.tsx. */}
         <Stack.Screen 
           name="NowPlaying" 
           component={NowPlayingScreen} 

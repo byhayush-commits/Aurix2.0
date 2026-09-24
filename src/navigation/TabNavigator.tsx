@@ -6,8 +6,8 @@ import { COLORS } from '../constants/theme';
 
 import HomeScreen from '../screens/Home';
 import SearchScreen from '../screens/Search';
-import LibraryScreen from '../screens/Library';
 import ProfileScreen from '../screens/Profile';
+import { LibraryStack } from './LibraryStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -43,7 +43,7 @@ export const TabNavigator = () => {
       />
       <Tab.Screen 
         name="LibraryTab" 
-        component={LibraryScreen} 
+        component={LibraryStack} 
         options={{
           tabBarIcon: ({ color, focused }) => (
             <Library color={color} size={24} strokeWidth={focused ? 2 : 1.5} />
