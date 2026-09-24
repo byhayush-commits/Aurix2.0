@@ -1,25 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Heart,
-  Clock,
-  Pencil,
-  Check,
-  ExternalLink,
-  Hammer,
-  AtSign,
-  Info,
-  Activity,
-  Package,
-} from 'lucide-react-native';
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image,
+  Platform,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Heart, Clock, Pencil, Check, X, Hammer, Info, Activity, Package } from 'lucide-react-native';
+import Svg, { Circle, Rect } from 'react-native-svg';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { Header } from '../components/common/Header';
-import { StatCard } from '../components/common/StatCard';
 import { ListRow } from '../components/common/ListRow';
 import { FlowerMark } from '../components/common/FlowerMark';
 import { Gender } from '../services/LibraryService';
@@ -35,8 +34,6 @@ const GENDERS: { value: Gender; label: string }[] = [
 
 const REPO_URL = 'https://github.com/byhayush-commits/Aurix2.0';
 const IG_URL = 'https://www.instagram.com/vivac_ayu';
-const GPL_URL = 'https://www.gnu.org/licenses/gpl-3.0.en.html';
-const NEWPIPE_URL = 'https://github.com/TeamNewPipe/NewPipeExtractor';
 
 // Hardcoded per explicit instruction -- not derived from app.json/expoConfig.
 // Update these two lines manually at release time.
@@ -56,6 +53,15 @@ const DEPENDENCIES: { name: string; version: string }[] = [
   { name: 'NewPipe Extractor', version: 'v0.26.5' },
 ];
 
+/** Inline Instagram glyph (lucide dropped brand icons) — used only in the follow capsule. */
+const InstagramGlyph: React.FC<{ size?: number; color?: string }> = ({ size = 18, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Rect x="3" y="3" width="18" height="18" rx="5.5" stroke={color} strokeWidth={2} />
+    <Circle cx="12" cy="12" r="4.2" stroke={color} strokeWidth={2} />
+    <Circle cx="17.1" cy="6.9" r="1.3" fill={color} />
+  </Svg>
+);
+
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
@@ -65,9 +71,9 @@ export default function ProfileScreen() {
   const [name, setName] = useState(profile.name);
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
   const [showBuilder, setShowBuilder] = useState(false);
-  const [showDependencies, setShowDependencies] = useState(false);
   const [showSystemInfo, setShowSystemInfo] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [showDependencies, setShowDependencies] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem('@aurix_profile_pic').then((uri) => {
@@ -98,9 +104,7 @@ export default function ProfileScreen() {
     if (trimmed !== profile.name) saveProfile({ name: trimmed });
   }, [name, profile.name, saveProfile]);
 
-  // Explicit save: tapping the header icon while editing commits the name
-  // AND closes edit mode in one, unambiguous action -- no more relying on
-  // blur timing or having to tap the pencil a second time to "know" it saved.
+  /** Header icon = one unambiguous save-and-exit action while editing. */
   const handleHeaderIconPress = useCallback(() => {
     if (editing) {
       commitName();
@@ -135,6 +139,7 @@ export default function ProfileScreen() {
           onRightPress={handleHeaderIconPress}
         />
 
+        {/* ---- identity ---- */}
         <View style={styles.identityRow}>
           <TouchableOpacity onPress={editing ? pickImage : undefined} style={styles.avatar}>
             {profileImageUri ? (
@@ -161,7 +166,10 @@ export default function ProfileScreen() {
               autoFocus
             />
           ) : (
-            <Text style={styles.name}>{profile.name || 'No name set'}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.name}>{profile.name || 'No name set'}</Text>
+              <Text style={styles.nameKicker}>LOCAL PROFILE</Text>
+            </View>
           )}
         </View>
 
@@ -182,24 +190,36 @@ export default function ProfileScreen() {
                 );
               })}
             </View>
-            <TouchableOpacity style={styles.saveBar} activeOpacity={0.85} onPress={handleHeaderIconPress}>
+            <TouchableOpacity style={styles.saveCapsule} activeOpacity={0.85} onPress={handleHeaderIconPress}>
               <Check color={COLORS.background} size={16} />
-              <Text style={styles.saveBarText}>Save changes</Text>
+              <Text style={styles.saveCapsuleText}>Save changes</Text>
             </TouchableOpacity>
           </>
         )}
 
+        {/* ---- stats ---- */}
         <View style={styles.statsRow}>
-          <StatCard icon={<Heart color={COLORS.accent.green} size={20} />} value={liked.length} label="Liked Songs" />
-          <TouchableOpacity style={styles.statTouchable} onPress={() => navigation.navigate('History')}>
-            <StatCard
-              icon={<Clock color={COLORS.accent.green} size={20} />}
-              value={history.length}
-              label="Listening History"
-            />
+          <View style={styles.statCard}>
+            <View style={styles.statTop}>
+              <Text style={styles.statValue}>{liked.length}</Text>
+              <Heart color={COLORS.accent.green} size={16} />
+            </View>
+            <Text style={styles.statLabel}>Liked Songs</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.statCard}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('History')}
+          >
+            <View style={styles.statTop}>
+              <Text style={styles.statValue}>{history.length}</Text>
+              <Clock color={COLORS.accent.green} size={16} />
+            </View>
+            <Text style={styles.statLabel}>Listening History</Text>
           </TouchableOpacity>
         </View>
 
+        {/* ---- about ---- */}
         <Text style={styles.sectionLabel}>ABOUT</Text>
         <View style={styles.group}>
           <View style={styles.aboutRow}>
@@ -213,33 +233,48 @@ export default function ProfileScreen() {
           <ListRow label="Source code" onPress={() => open(REPO_URL)} showDivider={false} />
         </View>
 
+        {/* ---- development ---- */}
         <Text style={styles.sectionLabel}>DEVELOPMENT</Text>
         <View style={styles.group}>
           <ListRow
             icon={<Hammer color={COLORS.text.primary} size={20} />}
             label="Builder"
             onPress={() => setShowBuilder((v) => !v)}
-            showDivider={false}
+            showDivider={showBuilder}
           />
           {showBuilder && (
             <View style={styles.builderCard}>
-              <FlowerMark size={52} />
-              <View style={styles.builderInfo}>
-                <Text style={styles.builderName}>Ayush</Text>
-                <Text style={styles.builderFollow}>Follow</Text>
-                <TouchableOpacity
-                  style={styles.builderIgRow}
-                  activeOpacity={0.7}
-                  onPress={() => open(IG_URL)}
-                >
-                  <AtSign color={COLORS.text.primary} size={15} />
-                  <Text style={styles.builderIgHandle}>vivac_ayu</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.builderClose}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                onPress={() => setShowBuilder(false)}
+              >
+                <X color={COLORS.text.secondary} size={18} />
+              </TouchableOpacity>
+
+              <View style={styles.builderRow}>
+                <FlowerMark size={64} />
+                <View style={styles.builderInfo}>
+                  <Text style={styles.builderName}>Ayush</Text>
+                  <Text style={styles.builderHandle}>@vivac_ayu</Text>
+                </View>
               </View>
+
+              <View style={styles.builderDivider} />
+
+              <TouchableOpacity
+                style={styles.followCapsule}
+                activeOpacity={0.8}
+                onPress={() => open(IG_URL)}
+              >
+                <InstagramGlyph size={18} />
+                <Text style={styles.followText}>Tap to Follow</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
 
+        {/* ---- technical ---- */}
         <Text style={styles.sectionLabel}>TECHNICAL</Text>
         <View style={styles.group}>
           <ListRow
@@ -264,6 +299,7 @@ export default function ProfileScreen() {
               </View>
             </View>
           )}
+
           <ListRow
             icon={<Activity color={COLORS.text.primary} size={20} />}
             label="Diagnostics"
@@ -286,29 +322,12 @@ export default function ProfileScreen() {
               </View>
             </View>
           )}
+
           <ListRow
             icon={<Package color={COLORS.text.primary} size={20} />}
             label="Open Source Libraries"
             onPress={() => setShowDependencies((v) => !v)}
-            showDivider={false}
-          />
-        </View>
-
-        <Text style={styles.sectionLabel}>SUPPORT</Text>
-        <View style={styles.group}>
-          <ListRow label="Help & Support" onPress={() => open(REPO_URL + '/issues')} />
-          <ListRow label="Report a Bug" onPress={() => open(REPO_URL + '/issues/new')} showDivider={false} />
-        </View>
-
-        <Text style={styles.sectionLabel}>LICENCE</Text>
-        <View style={styles.group}>
-          <View style={styles.licenceHeaderRow}>
-            <Text style={styles.licenceAppName}>Aurix</Text>
-            <Text style={styles.licenceType}>GPL-3.0-or-later</Text>
-          </View>
-          <ListRow
-            label="Dependencies"
-            onPress={() => setShowDependencies((v) => !v)}
+            showDivider={showDependencies}
           />
           {showDependencies && (
             <View style={styles.infoBlock}>
@@ -320,37 +339,13 @@ export default function ProfileScreen() {
               ))}
             </View>
           )}
-          <ListRow label="Read GPL-3.0" onPress={() => open(GPL_URL)} showDivider={false} />
         </View>
 
-        {/* ---- Legal body text — required attribution, kept verbatim ---- */}
-        <View style={styles.legalCard}>
-          <Text style={styles.legalTitle}>Aurix</Text>
-          <Text style={styles.legalBody}>
-            Copyright © 2026 Ayush.{'\n\n'}
-            This program is free software: you can redistribute it and/or modify it
-            under the terms of the GNU General Public License as published by the
-            Free Software Foundation, either version 3 of the License, or (at your
-            option) any later version.{'\n\n'}
-            This program is distributed in the hope that it will be useful, but
-            WITHOUT ANY WARRANTY; without even the implied warranty of
-            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-          </Text>
-        </View>
-
-        <View style={styles.legalCard}>
-          <Text style={styles.legalTitle}>NewPipe Extractor</Text>
-          <Text style={styles.legalBody}>
-            Copyright © Team NewPipe and contributors, licensed GPL-3.0-or-later.
-            {'\n\n'}
-            Aurix uses it, unmodified, to resolve playable audio. No NewPipe source
-            is included in this app, and linking it is why Aurix carries the same
-            licence.
-          </Text>
-          <TouchableOpacity style={styles.legalLink} onPress={() => open(NEWPIPE_URL)} activeOpacity={0.7}>
-            <Text style={styles.legalLinkText}>NewPipeExtractor on GitHub</Text>
-            <ExternalLink color={COLORS.text.secondary} size={16} />
-          </TouchableOpacity>
+        {/* ---- support ---- */}
+        <Text style={styles.sectionLabel}>SUPPORT</Text>
+        <View style={styles.group}>
+          <ListRow label="Help & Support" onPress={() => open(REPO_URL + '/issues')} />
+          <ListRow label="Report a Bug" onPress={() => open(REPO_URL + '/issues/new')} showDivider={false} />
         </View>
       </ScrollView>
     </View>
@@ -359,22 +354,23 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+
   identityRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.md,
     gap: SIZES.md,
-    marginBottom: SIZES.md,
+    marginBottom: SIZES.lg,
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: COLORS.surfaceLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarImage: { width: '100%', height: '100%', borderRadius: 32 },
+  avatarImage: { width: '100%', height: '100%', borderRadius: 34 },
   cameraBadge: {
     position: 'absolute',
     bottom: 0,
@@ -389,17 +385,25 @@ const styles = StyleSheet.create({
     borderColor: COLORS.background,
   },
   avatarInitial: { fontFamily: FONTS.extrabold, fontSize: 26, color: COLORS.text.primary },
-  name: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.text.primary },
+  name: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.text.primary },
+  nameKicker: {
+    fontFamily: FONTS.medium,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: COLORS.text.muted,
+    marginTop: 3,
+  },
   nameInput: {
     flex: 1,
     fontFamily: FONTS.bold,
     fontSize: 20,
     color: COLORS.text.primary,
     backgroundColor: COLORS.surfaceLight,
-    borderRadius: SIZES.radius.sm,
-    paddingHorizontal: SIZES.md,
+    borderRadius: SIZES.radius.pill,
+    paddingHorizontal: SIZES.lg,
     paddingVertical: SIZES.sm,
   },
+
   pillRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -418,7 +422,7 @@ const styles = StyleSheet.create({
   pillActive: { backgroundColor: COLORS.accent.green, borderColor: COLORS.accent.green },
   pillText: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.text.secondary },
   pillTextActive: { color: COLORS.text.primary },
-  saveBar: {
+  saveCapsule: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -426,16 +430,37 @@ const styles = StyleSheet.create({
     marginHorizontal: SIZES.md,
     marginBottom: SIZES.lg,
     backgroundColor: COLORS.accent.green,
-    borderRadius: SIZES.radius.sm,
-    paddingVertical: SIZES.sm,
+    borderRadius: SIZES.radius.pill,
+    paddingVertical: SIZES.sm + 2,
   },
-  saveBarText: { fontFamily: FONTS.semibold, fontSize: 14, color: COLORS.background },
-  statsRow: { flexDirection: 'row', gap: SIZES.md, paddingHorizontal: SIZES.md, marginBottom: SIZES.xl },
-  statTouchable: { flex: 1 },
+  saveCapsuleText: { fontFamily: FONTS.semibold, fontSize: 14, color: COLORS.background },
+
+  statsRow: {
+    flexDirection: 'row',
+    gap: SIZES.smd,
+    paddingHorizontal: SIZES.md,
+    marginBottom: SIZES.xl,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: SIZES.radius.lg,
+    paddingHorizontal: SIZES.md,
+    paddingVertical: SIZES.md,
+  },
+  statTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  statValue: { fontFamily: FONTS.extrabold, fontSize: 26, color: COLORS.text.primary },
+  statLabel: { fontFamily: FONTS.regular, fontSize: 12, color: COLORS.text.secondary },
+
   sectionLabel: {
     fontFamily: FONTS.semibold,
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontSize: 11,
+    letterSpacing: 2,
     color: COLORS.text.muted,
     marginBottom: SIZES.sm,
     marginHorizontal: SIZES.md,
@@ -447,50 +472,6 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xl,
     overflow: 'hidden',
   },
-  builderCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SIZES.md,
-    paddingHorizontal: SIZES.md,
-    paddingTop: SIZES.xs,
-    paddingBottom: SIZES.md,
-  },
-  builderInfo: { flex: 1 },
-  builderName: {
-    fontFamily: FONTS.bold,
-    fontSize: 17,
-    color: COLORS.text.primary,
-  },
-  builderFollow: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: COLORS.text.secondary,
-    marginTop: 2,
-    marginBottom: SIZES.sm,
-  },
-  builderIgRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
-  },
-  builderIgHandle: {
-    fontFamily: FONTS.semibold,
-    fontSize: 14,
-    color: COLORS.text.primary,
-  },
-  infoBlock: {
-    paddingHorizontal: SIZES.md,
-    paddingBottom: SIZES.md,
-    gap: SIZES.xs,
-  },
-  infoLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 3,
-  },
-  infoKey: { fontFamily: FONTS.regular, fontSize: 13, color: COLORS.text.secondary },
-  infoValue: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.text.primary },
   aboutRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -500,26 +481,69 @@ const styles = StyleSheet.create({
   aboutDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: COLORS.hairline },
   aboutLabel: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.text.secondary },
   aboutValue: { fontFamily: FONTS.medium, fontSize: 15, color: COLORS.text.primary },
-  licenceHeaderRow: {
+
+  infoBlock: {
+    paddingHorizontal: SIZES.md,
+    paddingTop: SIZES.xs,
+    paddingBottom: SIZES.smd,
+  },
+  infoLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: COLORS.hairline,
+    paddingVertical: 6,
   },
-  licenceAppName: { fontFamily: FONTS.bold, fontSize: 15, color: COLORS.text.primary },
-  licenceType: { fontFamily: FONTS.regular, fontSize: 12, color: COLORS.text.muted },
-  legalCard: {
+  infoKey: { fontFamily: FONTS.regular, fontSize: 13, color: COLORS.text.secondary },
+  infoValue: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.text.primary },
+
+  /* ---- builder card (inline expand, image-exact) ---- */
+  builderCard: {
     marginHorizontal: SIZES.md,
-    padding: SIZES.md,
+    marginTop: SIZES.xs,
+    marginBottom: SIZES.md,
+    backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius.lg,
-    backgroundColor: COLORS.surfaceLight,
-    marginBottom: SIZES.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(250, 45, 85, 0.35)',
+    paddingHorizontal: SIZES.lg,
+    paddingTop: SIZES.md,
+    paddingBottom: SIZES.lg,
   },
-  legalTitle: { fontFamily: FONTS.semibold, fontSize: 16, color: COLORS.text.primary, marginBottom: SIZES.sm },
-  legalBody: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 19, color: COLORS.text.secondary, marginBottom: SIZES.sm },
-  legalLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: SIZES.sm },
-  legalLinkText: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.text.primary },
+  builderClose: {
+    position: 'absolute',
+    top: SIZES.sm,
+    right: SIZES.sm,
+    padding: SIZES.xs,
+  },
+  builderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.lg,
+    paddingTop: SIZES.sm,
+  },
+  builderInfo: { flex: 1 },
+  builderName: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.text.primary },
+  builderHandle: {
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.text.secondary,
+    marginTop: 4,
+  },
+  builderDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(250, 45, 85, 0.35)',
+    marginVertical: SIZES.lg,
+  },
+  followCapsule: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SIZES.smd,
+    borderRadius: SIZES.radius.pill,
+    borderWidth: 1,
+    borderColor: 'rgba(250, 45, 85, 0.55)',
+    backgroundColor: 'rgba(250, 45, 85, 0.08)',
+    paddingVertical: SIZES.md - 2,
+  },
+  followText: { fontFamily: FONTS.semibold, fontSize: 15, color: COLORS.text.primary },
 });
