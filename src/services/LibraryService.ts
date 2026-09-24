@@ -12,6 +12,8 @@ export type Gender = 'male' | 'female' | 'unspecified';
 export type UserProfile = {
   name: string;
   gender: Gender;
+  /** Optional, self-reported, local-only. Undefined if left blank. */
+  age?: number;
   /** True once the user has been through Get Started. */
   completed: boolean;
 };
@@ -19,6 +21,7 @@ export type UserProfile = {
 export const DEFAULT_PROFILE: UserProfile = {
   name: '',
   gender: 'unspecified',
+  age: undefined,
   completed: false,
 };
 
