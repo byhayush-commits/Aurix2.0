@@ -40,39 +40,53 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 
 /**
- * "Aurix" wordmark with a slow pulsing glow -- used ONLY as the Lyrics-view
- * header centerpiece (per request: no plain/normal "Aurix" text anywhere
- * else in the app, just this one shining treatment, here alone).
+ * "Aurix" with a subtle left-to-right light sweep -- used ONLY as the
+ * Lyrics-view header centerpiece (no glow/shadow, no plain "Aurix" text
+ * anywhere else in the app). Built from per-letter opacity, staggered
+ * left-to-right, rather than a glow/shadow -- much closer to "letters
+ * light up" than a pulsing halo.
  */
 const GlowingWordmark: React.FC = () => {
-  const pulse = useRef(new Animated.Value(0)).current;
+  const letters = 'Aurix'.split('');
+  const anims = useRef(letters.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
+    const stagger = 90;
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: false }),
-        Animated.timing(pulse, { toValue: 0, duration: 1400, useNativeDriver: false }),
+        Animated.stagger(
+          stagger,
+          anims.map((v) =>
+            Animated.sequence([
+              Animated.timing(v, { toValue: 1, duration: 260, useNativeDriver: true }),
+              Animated.timing(v, { toValue: 0, duration: 420, useNativeDriver: true }),
+            ])
+          )
+        ),
+        Animated.delay(900),
       ])
     );
     loop.start();
     return () => loop.stop();
-  }, [pulse]);
-
-  const textShadowRadius = pulse.interpolate({ inputRange: [0, 1], outputRange: [4, 16] });
-  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Animated.Text
-      style={[
-        styles.glowWordmark,
-        {
-          opacity,
-          textShadowRadius,
-        },
-      ]}
-    >
-      Aurix
-    </Animated.Text>
+    <View style={styles.glowRow}>
+      {letters.map((ch, i) => (
+        <Animated.Text
+          key={i}
+          style={[
+            styles.glowWordmark,
+            {
+              opacity: anims[i].interpolate({ inputRange: [0, 1], outputRange: [0.55, 0.95] }),
+            },
+          ]}
+        >
+          {ch}
+        </Animated.Text>
+      ))}
+    </View>
   );
 };
 
@@ -256,13 +270,12 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SIZES.lg },
   headerIcon: { padding: SIZES.xs },
   headerCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  glowRow: { flexDirection: 'row' },
   glowWordmark: {
     fontFamily: FONTS.extrabold,
-    fontSize: 20,
+    fontSize: 19,
     color: COLORS.text.primary,
     letterSpacing: 0.5,
-    textShadowColor: COLORS.accent.green,
-    textShadowOffset: { width: 0, height: 0 },
   },
   artworkContainer: {
     width: width - SIZES.lg * 2,

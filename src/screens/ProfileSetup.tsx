@@ -25,11 +25,14 @@ const GENDERS: { value: Gender; label: string }[] = [
 ];
 
 /**
- * One-time profile capture, shown after Get Started.
+ * One-time profile capture, shown after the app's own logo/splash for a
+ * first-time user (the old separate "N Ø T E" branded intro screen was
+ * removed from this flow entirely — this is the very first screen now).
  *
- * Deliberately minimal and entirely local: a name to personalise the greeting
- * and an optional gender. Neither is required -- an empty name simply falls
- * back to the generic greeting, and gender defaults to 'Prefer not to say'.
+ * Restyled to use Aurix's own accent (red, COLORS.accent.green) for active
+ * states and the primary button, instead of the previous neutral
+ * white/grey treatment. Three fields, all optional and local-only: name,
+ * gender, age.
  */
 export default function ProfileSetupScreen() {
   const insets = useSafeAreaInsets();
@@ -38,10 +41,17 @@ export default function ProfileSetupScreen() {
 
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender>('unspecified');
+  const [age, setAge] = useState('');
 
   const finish = () => {
     Keyboard.dismiss();
-    saveProfile({ name: name.trim(), gender, completed: true });
+    const parsedAge = parseInt(age, 10);
+    saveProfile({
+      name: name.trim(),
+      gender,
+      age: Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : undefined,
+      completed: true,
+    });
     navigation.replace('Main');
   };
 
@@ -66,9 +76,21 @@ export default function ProfileSetupScreen() {
             placeholderTextColor={COLORS.text.muted}
             autoCapitalize="words"
             autoCorrect={false}
+            returnKeyType="next"
+            maxLength={40}
+          />
+
+          <Text style={[styles.label, styles.labelSpaced]}>AGE</Text>
+          <TextInput
+            style={[styles.input, styles.ageInput]}
+            value={age}
+            onChangeText={(v) => setAge(v.replace(/[^0-9]/g, '').slice(0, 3))}
+            placeholder="Your age"
+            placeholderTextColor={COLORS.text.muted}
+            keyboardType="number-pad"
             returnKeyType="done"
             onSubmitEditing={finish}
-            maxLength={40}
+            maxLength={3}
           />
 
           <Text style={[styles.label, styles.labelSpaced]}>GENDER</Text>
@@ -92,12 +114,12 @@ export default function ProfileSetupScreen() {
         </View>
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + SIZES.xl }]}>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={finish}>
+          <TouchableOpacity style={styles.button} activeOpacity={0.85} onPress={finish}>
             <Text style={styles.buttonText}>
               {name.trim() ? `Continue as ${name.trim()}` : 'Continue'}
             </Text>
             <View style={styles.iconCircle}>
-              <ArrowRight color={COLORS.text.primary} size={20} />
+              <ArrowRight color={COLORS.background} size={20} />
             </View>
           </TouchableOpacity>
         </View>
@@ -116,14 +138,14 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.xxl,
   },
   kicker: {
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.semibold,
     fontSize: 11,
     letterSpacing: 3,
-    color: COLORS.text.muted,
+    color: COLORS.accent.green,
     marginBottom: SIZES.md,
   },
   title: {
-    fontFamily: FONTS.bold,
+    fontFamily: FONTS.extrabold,
     fontSize: 34,
     color: COLORS.text.primary,
     marginBottom: SIZES.sm,
@@ -151,12 +173,15 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 18,
     color: COLORS.text.primary,
-    backgroundColor: COLORS.surfaceRaised,
+    backgroundColor: COLORS.surfaceLight,
     borderRadius: SIZES.radius.md,
     borderWidth: 1,
     borderColor: COLORS.glassBorder,
     paddingHorizontal: SIZES.md,
     paddingVertical: SIZES.md,
+  },
+  ageInput: {
+    width: 140,
   },
   genderRow: {
     flexDirection: 'row',
@@ -169,11 +194,11 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius.pill,
     borderWidth: 1,
     borderColor: COLORS.glassBorder,
-    backgroundColor: COLORS.surfaceRaised,
+    backgroundColor: COLORS.surfaceLight,
   },
   genderPillActive: {
-    backgroundColor: COLORS.text.primary,
-    borderColor: COLORS.text.primary,
+    backgroundColor: COLORS.accent.green,
+    borderColor: COLORS.accent.green,
   },
   genderText: {
     fontFamily: FONTS.medium,
@@ -181,7 +206,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
   },
   genderTextActive: {
-    color: COLORS.background,
+    color: COLORS.text.primary,
   },
   footer: {
     paddingTop: SIZES.lg,
@@ -190,17 +215,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.surfaceRaised,
-    borderWidth: 1,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: COLORS.accent.green,
     borderRadius: SIZES.radius.pill,
     paddingVertical: SIZES.md,
     paddingHorizontal: SIZES.lg,
   },
   buttonText: {
-    fontFamily: FONTS.medium,
+    fontFamily: FONTS.semibold,
     fontSize: 18,
-    color: COLORS.text.primary,
+    color: COLORS.background,
   },
   iconCircle: {
     width: 40,
@@ -208,6 +231,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.15)',
   },
 });

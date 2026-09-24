@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Play, Shuffle, ListPlus, Heart } from 'lucide-react-native';
+import { ChevronLeft, Play, Shuffle, ListPlus, Heart } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { TrackRow } from '../components/lists/TrackRow';
@@ -100,6 +100,13 @@ export default function PlaylistDetailScreen() {
   if (!playlist) {
     return (
       <View style={[styles.container, { paddingTop: insets.top + SIZES.xxl }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[styles.backButton, { top: insets.top + SIZES.sm }]}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <ChevronLeft color={COLORS.text.primary} size={28} />
+        </TouchableOpacity>
         <GlassCard intensity={20} style={styles.emptyCard}>
           <Text style={styles.emptyText}>This playlist is no longer available.</Text>
         </GlassCard>
@@ -195,9 +202,17 @@ export default function PlaylistDetailScreen() {
         removeClippedSubviews
       />
 
-      {/* Explicit back control removed -- the stack's swipe-back gesture and
-          hardware back already handle this; app.json / your reference ask
-          for navigation-chrome-free screens where the OS already helps. */}
+      {/* Back button removed ONLY for Favorites/Liked Songs, per request --
+          every regular playlist keeps its explicit back control. */}
+      {!isLikedPlaylist && (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[styles.backButton, { top: insets.top + SIZES.sm }]}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <ChevronLeft color={COLORS.text.primary} size={28} />
+        </TouchableOpacity>
+      )}
 
       <AddToPlaylistSheet track={addingTrack} onClose={() => setAddingTrack(null)} />
 
