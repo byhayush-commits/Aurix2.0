@@ -46,12 +46,12 @@
       <stop offset="0" stop-color="#e80d45"/>
       <stop offset="1" stop-color="#a00b39"/>
     </linearGradient>
-    <linearGradient id="wavegrad" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="trace" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#FA2D55"/>
       <stop offset="1" stop-color="#FF9DB1"/>
     </linearGradient>
-    <clipPath id="waveclip">
-      <rect x="0" y="-14" width="640" height="110"/>
+    <clipPath id="ecgclip">
+      <rect x="0" y="-15" width="640" height="110"/>
     </clipPath>
   </defs>
 
@@ -75,15 +75,15 @@
   <text x="560" y="330" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" letter-spacing="6">Aurix</text>
   <text x="566" y="402" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="500" fill="#FF9DB1" letter-spacing="14">LISTEN WITHOUT LIMITS!</text>
 
-  <!-- Two drifting sine waves (replaces the old EQ bars) -->
-  <g transform="translate(566,452)" clip-path="url(#waveclip)">
+  <!-- ECG heartbeat trace: every loop eases in slow, then races, seamless -->
+  <g transform="translate(566,452)" clip-path="url(#ecgclip)">
     <g>
-      <animateTransform attributeName="transform" type="translate" values="0 0; -100 0" dur="2.4s" repeatCount="indefinite"/>
-      <path d="M0 40 Q25 0 50 40 T100 40 T150 40 T200 40 T250 40 T300 40 T350 40 T400 40 T450 40 T500 40 T550 40 T600 40 T650 40 T700 40 T750 40 T800 40" fill="none" stroke="url(#wavegrad)" stroke-width="6" stroke-linecap="round"/>
-    </g>
-    <g>
-      <animateTransform attributeName="transform" type="translate" values="0 0; -100 0" dur="3.4s" repeatCount="indefinite"/>
-      <path d="M0 40 Q25 80 50 40 T100 40 T150 40 T200 40 T250 40 T300 40 T350 40 T400 40 T450 40 T500 40 T550 40 T600 40 T650 40 T700 40 T750 40 T800 40" fill="none" stroke="url(#wavegrad)" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; -200 0" keyTimes="0;1" calcMode="spline" keySplines="0.5 0 0.85 0.45" dur="1.6s" repeatCount="indefinite"/>
+      <path d="M0 40 H55 L65 32 L75 40 H85 L92 44 L100 6 L108 52 L115 40 H125 L135 28 L150 40 H200
+               H255 L265 32 L275 40 H285 L292 44 L300 6 L308 52 L315 40 H325 L335 28 L350 40 H400
+               H455 L465 32 L475 40 H485 L492 44 L500 6 L508 52 L515 40 H525 L535 28 L550 40 H600
+               H655 L665 32 L675 40 H685 L692 44 L700 6 L708 52 L715 40 H725 L735 28 L750 40 H800"
+            fill="none" stroke="url(#trace)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </g>
 </svg>
