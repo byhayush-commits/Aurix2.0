@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/brand/logo.svg" width="120" alt="Aurix logo" />
+
 ![Aurix Banner](docs/brand/banner.svg)
 
 # Aurix
@@ -26,7 +28,7 @@ No account · No ads · No backend · No tracking
 
 - **Search** — songs, artists, albums and playlists with artwork and durations.
 - **Background playback** — keeps playing with the screen locked, via a foreground service.
-- **Lock-screen controls** — play/pause, skip and ±10s seek from the notification.
+- **Lock-screen controls** — play/pause and skip straight from the notification.
 - **Queue** — add, remove, drag-reorder, play-next, shuffle and repeat (off / all / one).
 - **Library** — liked songs, your playlists, imported public playlists, downloaded music.
 - **History** — what you played and when; resumes exactly where you left off.
@@ -75,20 +77,13 @@ No account · No ads · No backend · No tracking
 
 > Re-run `prebuild` after pulling changes that touch native config or plugins.
 
-## 🎨 Brand Assets
+## 🛠 Builder
 
-| File | Used for |
-| ---- | -------- |
-| `docs/brand/banner.svg` | repo hero banner (animated equalizer) |
-| `docs/brand/logo.svg` | app mark tile |
-| `docs/brand/features.svg` | feature cards strip |
-| `docs/brand/footer.svg` | footer wave + credits |
+**Ayush** — design, code, everything.
 
-## 📬 Builder
-
-- **Ayush** — design, code, everything.
-- Instagram: [@vivac_ayu](https://www.instagram.com/vivac_ayu)
-- Source: [byhayush-commits/Aurix2.0](https://github.com/byhayush-commits/Aurix2.0)
+- <img src="docs/brand/ig.svg" width="18" /> Instagram — [@vivac_ayu](https://www.instagram.com/vivac_ayu)
+- <img src="docs/brand/gh.svg" width="18" /> GitHub (real — follow me here) — [@ayush143-maker](https://github.com/ayush143-maker)
+- <img src="docs/brand/gh.svg" width="18" /> Source code — [byhayush-commits/Aurix2.0](https://github.com/byhayush-commits/Aurix2.0)
 
 <div align="center">
 
