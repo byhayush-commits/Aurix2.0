@@ -8,6 +8,6 @@
   <rect width="1520" height="240" fill="#0A0A0A"/>
   <path d="M0 150 C 240 70, 480 230, 760 150 S 1280 70, 1520 150 V240 H0 Z" fill="url(#w)" opacity="0.14"/>
   <path d="M0 170 C 260 100, 520 240, 780 170 S 1300 100, 1520 170 V240 H0 Z" fill="url(#w)" opacity="0.08"/>
-  <text x="760" y="104" text-anchor="middle" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="34" font-weight="700" fill="#FFFFFF">Built with love by Ayush</text>
-  <text x="760" y="146" text-anchor="middle" font-family="monospace" font-size="22" fill="#A1A1AA">@vivac_ayu · github.com/byhayush-commits/Aurix2.0</text>
+  <text x="760" y="104" text-anchor="middle" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="700" fill="#FFFFFF">Built with love by Ayush</text>
+  <text x="760" y="146" text-anchor="middle" font-family="monospace" font-size="22" fill="#A1A1AA">@vivac_ayu · github.com/ayush143-maker</text>
 </svg>
