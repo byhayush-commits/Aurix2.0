@@ -1,47 +1,75 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760">
   <defs>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&amp;display=swap');</style>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#0A0A0A"/>
       <stop offset="0.55" stop-color="#140710"/>
       <stop offset="1" stop-color="#1C0A12"/>
     </linearGradient>
-    <linearGradient id="pink" x1="0" y1="0" x2="0.6" y2="1">
-      <stop offset="0" stop-color="#FF8FA3"/>
-      <stop offset="0.45" stop-color="#FA2D55"/>
-      <stop offset="1" stop-color="#A81C3B"/>
-    </linearGradient>
-    <linearGradient id="pink2" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#C9184A"/>
-      <stop offset="0.6" stop-color="#FA2D55"/>
-      <stop offset="1" stop-color="#FF9DB1"/>
-    </linearGradient>
-    <linearGradient id="pink3" x1="1" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FF7A93"/>
-      <stop offset="1" stop-color="#C9184A"/>
-    </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FA2D55" stop-opacity="0.35"/>
       <stop offset="1" stop-color="#FA2D55" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="top-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff315e"/>
+      <stop offset="0.52" stop-color="#ff174b"/>
+      <stop offset="1" stop-color="#e50942"/>
+    </linearGradient>
+    <linearGradient id="top-left-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff174d"/>
+      <stop offset="0.62" stop-color="#cf0640"/>
+      <stop offset="1" stop-color="#a70a3b"/>
+    </linearGradient>
+    <linearGradient id="deep-face" x1="0" y1="0" x2="0" y2="0.7">
+      <stop offset="0" stop-color="#8f0a36"/>
+      <stop offset="1" stop-color="#4b0b25"/>
+    </linearGradient>
+    <linearGradient id="main-face" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#ff315d"/>
+      <stop offset="0.5" stop-color="#ff164b"/>
+      <stop offset="1" stop-color="#f10c45"/>
+    </linearGradient>
+    <linearGradient id="middle-top-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff174c"/>
+      <stop offset="0.48" stop-color="#e50b43"/>
+      <stop offset="1" stop-color="#a90b3a"/>
+    </linearGradient>
+    <linearGradient id="middle-deep-face" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="0" stop-color="#a40a3a"/>
+      <stop offset="1" stop-color="#590a2a"/>
+    </linearGradient>
+    <linearGradient id="small-bright-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2858"/>
+      <stop offset="0.55" stop-color="#ff174b"/>
+      <stop offset="1" stop-color="#ec0b43"/>
+    </linearGradient>
+    <linearGradient id="small-left-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e80d45"/>
+      <stop offset="1" stop-color="#a00b39"/>
+    </linearGradient>
   </defs>
 
   <rect width="1600" height="760" fill="url(#bg)"/>
-  <circle cx="430" cy="360" r="340" fill="url(#glow)"/>
+  <circle cx="350" cy="370" r="340" fill="url(#glow)"/>
 
-  <!-- Aurix mark: true 3-shard geometry (top spike / right blade / foot shard) -->
-  <g transform="translate(240,268)">
-    <path d="M205 0 L325 96 L135 56 Z" fill="url(#pink)"/>
-    <path d="M0 162 L118 70 L302 110 Z" fill="url(#pink2)"/>
-    <path d="M226 140 L330 116 L376 164 Z" fill="url(#pink3)"/>
+  <!-- Official Aurix mark (same geometry + faces as docs/brand/logo.svg) -->
+  <g transform="translate(150,180) scale(0.72)">
+    <path d="M275 38 L256 170 L187 191 Z" fill="url(#top-left-face)"/>
+    <path d="M275 38 L416 303 L256 170 Z" fill="url(#top-face)"/>
+    <path d="M187 191 L256 170 L416 303 Z" fill="url(#deep-face)"/>
+    <path d="M166 226 L34 464 L280 324 Z" fill="url(#main-face)"/>
+    <path d="M166 226 L280 324 L391 327 Z" fill="url(#middle-top-face)"/>
+    <path d="M34 464 L280 324 L391 327 Z" fill="url(#middle-deep-face)"/>
+    <path d="M417 344 L369 402 L478 473 Z" fill="url(#small-bright-face)"/>
+    <path d="M417 344 L297 412 L369 402 Z" fill="url(#small-left-face)"/>
+    <path d="M297 412 L369 402 L478 473 Z" fill="url(#deep-face)"/>
   </g>
 
   <!-- Wordmark + tagline -->
-  <text x="680" y="356" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" letter-spacing="6">Aurix</text>
-  <text x="688" y="428" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="500" fill="#FF9DB1" letter-spacing="14">LISTEN WITHOUT LIMITS!</text>
+  <text x="560" y="356" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" letter-spacing="6">Aurix</text>
+  <text x="566" y="428" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="500" fill="#FF9DB1" letter-spacing="14">LISTEN WITHOUT LIMITS!</text>
 
   <!-- Animated equalizer -->
-  <g transform="translate(688,556)" fill="url(#pink2)">
+  <g transform="translate(566,556)" fill="#FA2D55">
     <rect x="0" y="-46" width="12" height="46" rx="6"><animate attributeName="height" values="46;96;30;46" dur="1.4s" repeatCount="indefinite"/><animate attributeName="y" values="-46;-96;-30;-46" dur="1.4s" repeatCount="indefinite"/></rect>
     <rect x="26" y="-70" width="12" height="70" rx="6"><animate attributeName="height" values="70;34;88;70" dur="1.2s" repeatCount="indefinite"/><animate attributeName="y" values="-70;-34;-88;-70" dur="1.2s" repeatCount="indefinite"/></rect>
     <rect x="52" y="-38" width="12" height="38" rx="6"><animate attributeName="height" values="38;84;52;38" dur="1.6s" repeatCount="indefinite"/><animate attributeName="y" values="-38;-84;-52;-38" dur="1.6s" repeatCount="indefinite"/></rect>
@@ -54,5 +82,5 @@
     <rect x="234" y="-62" width="12" height="62" rx="6"><animate attributeName="height" values="62;36;80;62" dur="1.35s" repeatCount="indefinite"/><animate attributeName="y" values="-62;-36;-80;-62" dur="1.35s" repeatCount="indefinite"/></rect>
   </g>
 
-  <text x="688" y="636" font-family="monospace" font-size="24" fill="#6B7280">v17.7.0 · build 069 · android 7.0+</text>
+  <text x="566" y="636" font-family="monospace" font-size="24" fill="#6B7280">v17.7.0 · build 069 · android 7.0+</text>
 </svg>
