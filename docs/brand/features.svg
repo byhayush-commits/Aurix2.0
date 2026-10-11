@@ -8,8 +8,8 @@
       <circle r="16"/>
       <path d="M-4 -8 L10 0 L-4 8 Z" fill="#FA2D55" stroke="none"/>
     </g>
-    <text x="48" y="180" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Background Play</text>
-    <text x="48" y="216" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="20" fill="#A1A1AA">Screen off, music on</text>
+    <text x="48" y="180" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Background Play</text>
+    <text x="48" y="216" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="20" fill="#A1A1AA">Screen off, music on</text>
   </g>
 
   <g>
@@ -21,8 +21,8 @@
       <path d="M-14 9 H4"/>
       <circle cx="11" cy="9" r="3" fill="#FA2D55" stroke="none"/>
     </g>
-    <text x="428" y="180" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Smart Queue</text>
-    <text x="428" y="216" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="20" fill="#A1A1AA">Drag, reorder, play next</text>
+    <text x="428" y="180" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Smart Queue</text>
+    <text x="428" y="216" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="20" fill="#A1A1AA">Drag, reorder, play next</text>
   </g>
 
   <g>
@@ -33,8 +33,8 @@
       <path d="M-8 -4 L0 4 L8 -4"/>
       <path d="M-13 12 H13"/>
     </g>
-    <text x="808" y="180" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Offline Library</text>
-    <text x="808" y="216" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="20" fill="#A1A1AA">Likes and playlists on device</text>
+    <text x="808" y="180" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Offline Library</text>
+    <text x="808" y="216" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="20" fill="#A1A1AA">Likes and playlists on device</text>
   </g>
 
   <g>
@@ -45,7 +45,7 @@
       <path d="M-12 -2 a12 12 0 0 0 24 0"/>
       <path d="M0 10 V16"/>
     </g>
-    <text x="1188" y="180" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Live Lyrics</text>
-    <text x="1188" y="216" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="20" fill="#A1A1AA">Synced lines, real-time</text>
+    <text x="1188" y="180" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Live Lyrics</text>
+    <text x="1188" y="216" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="20" fill="#A1A1AA">Synced lines, real-time</text>
   </g>
 </svg>
