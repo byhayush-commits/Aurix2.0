@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/brand/logo.svg" width="120" alt="Aurix logo" />
-
 ![Aurix Banner](docs/brand/banner.svg)
 
 # Aurix
@@ -78,6 +76,12 @@ No account · No ads · No backend · No tracking
 > Re-run `prebuild` after pulling changes that touch native config or plugins.
 
 ## 🛠 Builder
+
+<div align="center">
+
+<img src="docs/brand/logo.svg" width="72" alt="Aurix mark" />
+
+</div>
 
 **Ayush** — design, code, everything.
 
