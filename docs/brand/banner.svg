@@ -1,18 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760">
   <defs>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&amp;display=swap');</style>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#0A0A0A"/>
       <stop offset="0.55" stop-color="#140710"/>
       <stop offset="1" stop-color="#1C0A12"/>
     </linearGradient>
-    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FF7A93"/>
-      <stop offset="0.5" stop-color="#FA2D55"/>
-      <stop offset="1" stop-color="#B01E3F"/>
+    <linearGradient id="pink" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#FF8FA3"/>
+      <stop offset="0.45" stop-color="#FA2D55"/>
+      <stop offset="1" stop-color="#A81C3B"/>
     </linearGradient>
     <linearGradient id="pink2" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#FA2D55"/>
+      <stop offset="0" stop-color="#C9184A"/>
+      <stop offset="0.6" stop-color="#FA2D55"/>
       <stop offset="1" stop-color="#FF9DB1"/>
+    </linearGradient>
+    <linearGradient id="pink3" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF7A93"/>
+      <stop offset="1" stop-color="#C9184A"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FA2D55" stop-opacity="0.35"/>
@@ -21,21 +27,21 @@
   </defs>
 
   <rect width="1600" height="760" fill="url(#bg)"/>
-  <circle cx="430" cy="380" r="340" fill="url(#glow)"/>
+  <circle cx="430" cy="360" r="340" fill="url(#glow)"/>
 
-  <!-- Aurix mark: three shards -->
-  <g transform="translate(290,220) scale(1.2)">
-    <path d="M118 0 L176 132 L62 94 Z" fill="url(#pink)"/>
-    <path d="M0 200 L180 140 L98 220 Z" fill="url(#pink2)"/>
-    <path d="M150 236 L232 198 L212 262 Z" fill="url(#pink)"/>
+  <!-- Aurix mark: true 3-shard geometry (top spike / right blade / foot shard) -->
+  <g transform="translate(240,268)">
+    <path d="M205 0 L325 96 L135 56 Z" fill="url(#pink)"/>
+    <path d="M0 162 L118 70 L302 110 Z" fill="url(#pink2)"/>
+    <path d="M226 140 L330 116 L376 164 Z" fill="url(#pink3)"/>
   </g>
 
   <!-- Wordmark + tagline -->
-  <text x="640" y="360" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" letter-spacing="6">Aurix</text>
-  <text x="648" y="432" font-family="Outfit, Segoe UI, system-ui, sans-serif" font-size="32" font-weight="500" fill="#FF9DB1" letter-spacing="14">LISTEN WITHOUT LIMITS!</text>
+  <text x="680" y="356" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" letter-spacing="6">Aurix</text>
+  <text x="688" y="428" font-family="Outfit, Poppins, Roboto, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="500" fill="#FF9DB1" letter-spacing="14">LISTEN WITHOUT LIMITS!</text>
 
   <!-- Animated equalizer -->
-  <g transform="translate(648,560)" fill="url(#pink2)">
+  <g transform="translate(688,556)" fill="url(#pink2)">
     <rect x="0" y="-46" width="12" height="46" rx="6"><animate attributeName="height" values="46;96;30;46" dur="1.4s" repeatCount="indefinite"/><animate attributeName="y" values="-46;-96;-30;-46" dur="1.4s" repeatCount="indefinite"/></rect>
     <rect x="26" y="-70" width="12" height="70" rx="6"><animate attributeName="height" values="70;34;88;70" dur="1.2s" repeatCount="indefinite"/><animate attributeName="y" values="-70;-34;-88;-70" dur="1.2s" repeatCount="indefinite"/></rect>
     <rect x="52" y="-38" width="12" height="38" rx="6"><animate attributeName="height" values="38;84;52;38" dur="1.6s" repeatCount="indefinite"/><animate attributeName="y" values="-38;-84;-52;-38" dur="1.6s" repeatCount="indefinite"/></rect>
@@ -48,5 +54,5 @@
     <rect x="234" y="-62" width="12" height="62" rx="6"><animate attributeName="height" values="62;36;80;62" dur="1.35s" repeatCount="indefinite"/><animate attributeName="y" values="-62;-36;-80;-62" dur="1.35s" repeatCount="indefinite"/></rect>
   </g>
 
-  <text x="648" y="640" font-family="monospace" font-size="24" fill="#6B7280">v17.7.0 · build 069 · android 7.0+</text>
+  <text x="688" y="636" font-family="monospace" font-size="24" fill="#6B7280">v17.7.0 · build 069 · android 7.0+</text>
 </svg>
