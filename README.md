@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/brand/logo.svg" width="120" alt="Aurix logo" />
+
 
 ![Aurix Banner](docs/brand/banner.svg)
 
